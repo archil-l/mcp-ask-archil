@@ -6,11 +6,10 @@
   "type": "module",
   "license": "ISC",
   "scripts": {
-    "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "bundle": "esbuild src/handler.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/mcp-lambda/index.mjs --external:@aws-sdk/*",
-    "build:cdk": "tsc -p cdk/tsconfig.json",
-    "deploy": "npm run bundle && npm run build:cdk && cdk deploy --all"
+    "build": "tsc && esbuild src/handler.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/mcp-lambda/index.mjs --external:@aws-sdk/*",
+    "cdk:build": "tsc -p cdk/tsconfig.json",
+    "cdk:deploy": "npm run build && npm run build:cdk && npx cdk deploy"
   },
   "dependencies": {
     "@aws-sdk/client-route-53": "^3.893.0",

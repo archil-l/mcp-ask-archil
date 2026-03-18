@@ -19,21 +19,25 @@ console.log(
 );
 
 // OIDC Stack - for GitHub Actions authentication
-new GitHubOidcStack(app, `ask-archil-io-github-oidc-${envConfig.stage}`, {
-  envConfig,
-  githubOrg: GITHUB_ORG,
-  githubRepo: GITHUB_REPO,
-  env: {
-    account: envConfig.accountId,
-    region: envConfig.region,
+new GitHubOidcStack(
+  app,
+  `${envConfig.prefix}-archil-io-github-oidc-${envConfig.stage}`,
+  {
+    envConfig,
+    githubOrg: GITHUB_ORG,
+    githubRepo: GITHUB_REPO,
+    env: {
+      account: envConfig.accountId,
+      region: envConfig.region,
+    },
   },
-});
+);
 
 // Subdomain Stack - creates hosted zone and ACM certificate for custom domain
 // Optionally updates NS delegation in parent account via custom resource
 const subdomainStack = new SubdomainStack(
   app,
-  `ask-archil-io-subdomain-${envConfig.stage}`,
+  `${envConfig.prefix}-archil-io-subdomain-${envConfig.stage}`,
   {
     domainName: envConfig.domainName || "",
     parentHostedZoneId: envConfig.parentHostedZoneId,
@@ -48,7 +52,7 @@ const subdomainStack = new SubdomainStack(
 // LLM Streaming Stack - separate Lambda with Function URL for streaming responses
 const mcpServerStack = new MCPServerStack(
   app,
-  `mcp-server-archil-io-${envConfig.stage}`,
+  `${envConfig.prefix}-server-archil-io-${envConfig.stage}`,
   {
     envConfig,
     env: {

@@ -30,7 +30,7 @@ export class GitHubOidcStack extends cdk.Stack {
 
     // Create IAM Role for GitHub Actions
     this.role = new iam.Role(this, "github-actions-role", {
-      roleName: `ask-archil-io-github-actions-role-${envConfig.stage}`,
+      roleName: `${envConfig.prefix}-archil-io-github-actions-role-${envConfig.stage}`,
       assumedBy: new iam.FederatedPrincipal(
         this.oidcProvider.openIdConnectProviderArn,
         {
@@ -145,7 +145,7 @@ export class GitHubOidcStack extends cdk.Stack {
         effect: iam.Effect.ALLOW,
         actions: ["iam:PassRole"],
         resources: [
-          `arn:aws:iam::${this.account}:role/ask-archil-io-lambda-execution-role-${envConfig.stage}`,
+          `arn:aws:iam::${this.account}:role/${envConfig.prefix}-archil-io-lambda-execution-role-${envConfig.stage}`,
         ],
       }),
     );
@@ -164,7 +164,9 @@ export class GitHubOidcStack extends cdk.Stack {
           "iam:GetRole",
           "iam:DeleteRole",
         ],
-        resources: [`arn:aws:iam::${this.account}:role/ask-archil-io-*`],
+        resources: [
+          `arn:aws:iam::${this.account}:role/${envConfig.stage}-archil-io-*`,
+        ],
       }),
     );
 
@@ -174,7 +176,7 @@ export class GitHubOidcStack extends cdk.Stack {
         effect: iam.Effect.ALLOW,
         actions: ["sts:AssumeRole"],
         resources: [
-          "arn:aws:iam::359373592118:role/agent-archil-io-dns-delegation-role",
+          `arn:aws:iam::359373592118:role/${envConfig.stage}-archil-io-dns-delegation-role`,
         ],
       }),
     );
@@ -198,7 +200,7 @@ export class GitHubOidcStack extends cdk.Stack {
     new cdk.CfnOutput(this, "github-actions-role-arn", {
       description: "ARN of the GitHub Actions IAM role (use in GitHub Secrets)",
       value: this.role.roleArn,
-      exportName: `ask-archil-io-github-actions-role-arn-${envConfig.stage}`,
+      exportName: `${envConfig.prefix}-archil-io-github-actions-role-arn-${envConfig.stage}`,
     });
 
     new cdk.CfnOutput(this, "oidc-provider-arn", {

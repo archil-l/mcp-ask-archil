@@ -27,8 +27,10 @@ export interface EnvironmentConfig {
   htmlCacheTtlMinutes: number;
   /** CloudFront assets cache TTL in days */
   assetsCacheTtlDays: number;
-  /** Custom domain name */
+  /** Custom full domain name ask.archil.io */
   domainName?: string;
+  /** sub domain prefix e.g. ask, mcp */
+  prefix?: string;
   /** Parent account Route 53 Hosted Zone ID (for NS delegation) */
   parentHostedZoneId?: string;
   /** IAM role ARN for cross-account NS delegation in parent account */
@@ -44,6 +46,7 @@ const environments: Record<Stage, EnvironmentConfig> = {
     logRetentionDays: 30,
     htmlCacheTtlMinutes: 60,
     assetsCacheTtlDays: 30,
+    prefix: "mcp",
     domainName: "mcp.archil.io",
     parentHostedZoneId: "Z00681622F9CUFDPFSU6B",
     parentDelegationRoleArn:
