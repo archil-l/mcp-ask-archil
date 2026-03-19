@@ -18,18 +18,16 @@ export class GitHubOidcStack extends cdk.Stack {
 
     const { githubOrg, githubRepo, envConfig } = props;
 
-    // Create OIDC Identity Provider for GitHub Actions
-    this.oidcProvider = new iam.OpenIdConnectProvider(
+    // Inside your stack constructor
+    const oidcProviderArn = `arn:aws:iam::${envConfig.accountId}:oidc-provider/token.actions.githubusercontent.com`;
+    this.oidcProvider = iam.OpenIdConnectProvider.fromOpenIdConnectProviderArn(
       this,
       "github-oidc-provider",
-      {
-        url: "https://token.actions.githubusercontent.com",
-        clientIds: ["sts.amazonaws.com"],
-      },
+      oidcProviderArn,
     );
 
     // Create IAM Role for GitHub Actions
-    this.role = new iam.Role(this, "github-actions-role", {
+    this.role = new iam.Role(this, `${envConfig.prefix}-github-actions-role`, {
       roleName: `${envConfig.prefix}-archil-io-github-actions-role-${envConfig.stage}`,
       assumedBy: new iam.FederatedPrincipal(
         this.oidcProvider.openIdConnectProviderArn,
