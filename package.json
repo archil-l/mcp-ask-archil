@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc && esbuild src/handler.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/mcp-lambda/index.mjs --external:@aws-sdk/*",
+    "build": "tsc && node esbuild.config.mjs",
     "build:cdk": "tsc -p cdk/tsconfig.json",
     "deploy": "npm run build && npm run build:cdk && npx cdk deploy"
   },
