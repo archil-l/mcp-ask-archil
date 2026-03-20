@@ -21,6 +21,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/credential-provider-node": "^3.972.23",
+    "@smithy/protocol-http": "^5.3.12",
+    "@smithy/signature-v4": "^5.3.12",
     "@types/aws-lambda": "^8.10.161",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
