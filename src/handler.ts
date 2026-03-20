@@ -84,4 +84,4 @@ process.on("SIGINT", async () => {
 
 const handler = serverless(app);
 
-export default handler;
+export { handler };
