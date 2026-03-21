@@ -1,30 +1,36 @@
-import serverless from "serverless-http";
 import express from "express";
 import type { Request, Response } from "express";
+import serverlessExpress from "@codegenie/serverless-express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import "source-map-support/register.js";
-import server from "./server.js";
 
+import { createMCPServer } from "./server.js";
+
+let serverlessExpressInstance: any;
 const app = express();
 app.use(express.json());
 
-app.post("/mcp", async (req: Request, res: Response) => {
+app.post("/mcp", async (request: Request, response: Response) => {
   try {
+    const server = createMCPServer();
+
     const transport: StreamableHTTPServerTransport =
       new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
+
+    // response.on("close", () => {
+    //   console.log("Request closed");
+    //   transport.close();
+    //   server.close();
+    // });
+
     await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-    res.on("close", () => {
-      console.log("Request closed");
-      transport.close();
-      server.close();
-    });
+    await transport.handleRequest(request, response, request.body);
   } catch (error) {
     console.error("Error handling MCP request:", error);
-    if (!res.headersSent) {
-      res.status(500).json({
+    if (!response.headersSent) {
+      response.status(500).json({
         jsonrpc: "2.0",
         error: {
           code: -32_603,
@@ -69,19 +75,21 @@ const PORT = 3000;
 app.listen(PORT, (error) => {
   if (error) {
     console.error("Failed to start server:", error);
-    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(1);
   }
   console.log(`MCP Stateless Streamable HTTP Server listening on port ${PORT}`);
 });
 
-// Handle server shutdown
-process.on("SIGINT", async () => {
-  console.log("Shutting down server...");
-  // eslint-disable-next-line unicorn/no-process-exit
-  process.exit(0);
-});
+async function setup(event: any, context: any) {
+  serverlessExpressInstance = serverlessExpress({ app });
+  return serverlessExpressInstance(event, context);
+}
 
-const handler = serverless(app);
+function handler(event: any, context: any) {
+  if (serverlessExpressInstance)
+    return serverlessExpressInstance(event, context);
+
+  return setup(event, context);
+}
 
 export { handler };
