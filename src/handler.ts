@@ -19,14 +19,10 @@ app.post("/mcp", async (request: Request, response: Response) => {
         sessionIdGenerator: undefined,
       });
 
-    // response.on("close", () => {
-    //   console.log("Request closed");
-    //   transport.close();
-    //   server.close();
-    // });
-
     await server.connect(transport);
+    console.log("Server connected");
     await transport.handleRequest(request, response, request.body);
+    console.log("MCP Request completed");
   } catch (error) {
     console.error("Error handling MCP request:", error);
     if (!response.headersSent) {
@@ -78,6 +74,12 @@ app.listen(PORT, (error) => {
     process.exit(1);
   }
   console.log(`MCP Stateless Streamable HTTP Server listening on port ${PORT}`);
+});
+
+process.on("SIGINT", async () => {
+  console.log("Shutting down server...");
+  // eslint-disable-next-line unicorn/no-process-exit
+  process.exit(0);
 });
 
 async function setup(event: any, context: any) {

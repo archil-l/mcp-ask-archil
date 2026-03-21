@@ -20,6 +20,8 @@ export const getAlertsTool = defineTool(
     }),
   },
   async ({ state }) => {
+    console.log("Calling alert tool");
+
     const stateCode = state.toUpperCase();
     const alertsUrl = `${NWS_API_BASE}/alerts?area=${stateCode}`;
     const alertsData = await makeNWSRequest<AlertsResponse>(alertsUrl);
