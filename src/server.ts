@@ -6,7 +6,7 @@ import { addNumbersTool } from "./tools/add-numbers.js";
 export function createMCPServer() {
   // Create server instance
   const server = new McpServer({
-    name: "weather",
+    name: "mcp-ask-archil",
     version: "1.0.0",
   });
 
