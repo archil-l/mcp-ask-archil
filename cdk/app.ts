@@ -7,7 +7,7 @@ import { MCPServerStack } from "./lib/mcp-server-stack.js";
 import { getEnvironmentConfig, Stage } from "./config/environments.js";
 
 const GITHUB_ORG = "archil-l";
-const GITHUB_REPO = "ask-archil-io";
+const GITHUB_REPO = "mcp-ask-archil";
 
 const app = new cdk.App();
 
