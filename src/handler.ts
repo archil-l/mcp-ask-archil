@@ -1,4 +1,4 @@
-import express from "express";
+import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Request, Response } from "express";
 import serverlessExpress from "@codegenie/serverless-express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -7,8 +7,7 @@ import "source-map-support/register.js";
 import { createMCPServer } from "./server.js";
 
 let serverlessExpressInstance: any;
-const app = express();
-app.use(express.json());
+const app = createMcpExpressApp({ host: "0.0.0.0" });
 
 app.post("/mcp", async (request: Request, response: Response) => {
   try {
