@@ -15,11 +15,9 @@ import { Sha256 } from "@aws-crypto/sha256-js";
 import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import { HttpRequest } from "@smithy/protocol-http";
 
-const TARGET_URL =
-  process.env.MCP_TARGET_URL ||
-  "https://ldlv3xoi43ix4krzy6gtf2skau0rfjrk.lambda-url.us-east-1.on.aws";
-const REGION = process.env.AWS_REGION || "us-east-1";
-const PORT = parseInt(process.env.PORT || "3001", 10);
+const TARGET_URL = process.env.MCP_TARGET_URL;
+const REGION = process.env.AWS_REGION || "";
+const PORT = parseInt(process.env.PORT || "", 10);
 
 const app = express();
 app.use(express.raw({ type: "*/*", limit: "10mb" }));
@@ -90,11 +88,34 @@ app.use(async (req, res) => {
 
     res.status(response.status);
 
+    // Helper function to unwrap Lambda response envelope if present
+    const unwrapLambdaResponse = (
+      data: string,
+    ): { body: string; statusCode?: number } => {
+      try {
+        const parsed = JSON.parse(data);
+        if (
+          parsed &&
+          typeof parsed.statusCode === "number" &&
+          typeof parsed.body === "string"
+        ) {
+          console.log(
+            `[PROXY] Unwrapping Lambda envelope (statusCode: ${parsed.statusCode})`,
+          );
+          return { body: parsed.body, statusCode: parsed.statusCode };
+        }
+      } catch {
+        // Not JSON or not a Lambda envelope, use as-is
+      }
+      return { body: data };
+    };
+
     // Check if it's a streaming response
     const contentType = response.headers.get("content-type") || "";
 
     if (contentType.includes("text/event-stream") && response.body) {
       // Stream the response
+      res.setHeader("content-type", "text/event-stream");
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -105,7 +126,13 @@ app.use(async (req, res) => {
 
           const chunk = decoder.decode(value, { stream: true });
           console.log(`[PROXY] Streaming chunk: ${chunk.substring(0, 100)}...`);
-          res.write(chunk);
+
+          // Check if the chunk is a Lambda envelope
+          const unwrapped = unwrapLambdaResponse(chunk);
+          if (unwrapped.statusCode) {
+            res.status(unwrapped.statusCode);
+          }
+          res.write(unwrapped.body);
         }
       } finally {
         reader.releaseLock();
@@ -117,7 +144,19 @@ app.use(async (req, res) => {
       console.log(
         `[PROXY] Response body: ${responseBody.substring(0, 200)}${responseBody.length > 200 ? "..." : ""}`,
       );
-      res.send(responseBody);
+
+      // Check if the response is a Lambda envelope
+      const unwrapped = unwrapLambdaResponse(responseBody);
+      if (unwrapped.statusCode) {
+        res.status(unwrapped.statusCode);
+      }
+
+      // Check if the unwrapped body is SSE format
+      if (unwrapped.body.startsWith("event:")) {
+        res.setHeader("content-type", "text/event-stream");
+      }
+
+      res.send(unwrapped.body);
     }
   } catch (error) {
     console.error("[PROXY] Error:", error);
