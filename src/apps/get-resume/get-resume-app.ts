@@ -47,7 +47,7 @@ async function fetchResumePdf(): Promise<string> {
  * Registers the get-resume MCP App (tool + resource) on the given server.
  */
 export function registerGetResumeApp(server: McpServer): void {
-  const resourceUri = "ui://get-resume/";
+  const resourceUri = "ui://get-resume";
 
   // Register the tool with UI metadata
   registerAppTool(
