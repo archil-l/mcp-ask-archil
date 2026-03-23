@@ -18,7 +18,6 @@ const buildConfig = {
   target: "node24",
   format: "cjs",
   outfile: "dist/mcp-lambda/index.js",
-  external: ["@aws-sdk/*"],
   sourcemap: true,
   minify: false,
   metafile: true,
