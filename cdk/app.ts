@@ -4,6 +4,7 @@ import * as cdk from "aws-cdk-lib";
 import { GitHubOidcStack } from "./lib/github-oidc-stack.js";
 import { SubdomainStack } from "./lib/subdomain-stack.js";
 import { MCPServerStack } from "./lib/mcp-server-stack.js";
+import { ResumeBucketStack } from "./lib/resume-bucket-stack.js";
 import { getEnvironmentConfig, Stage } from "./config/environments.js";
 
 const GITHUB_ORG = "archil-l";
@@ -49,12 +50,26 @@ const subdomainStack = new SubdomainStack(
   },
 );
 
-// LLM Streaming Stack - separate Lambda with Function URL for streaming responses
+// Resume Bucket Stack - S3 bucket for storing resume PDF
+const resumeBucketStack = new ResumeBucketStack(
+  app,
+  `${envConfig.prefix}-resume-bucket-${envConfig.stage}`,
+  {
+    envConfig,
+    env: {
+      account: envConfig.accountId,
+      region: envConfig.region,
+    },
+  },
+);
+
+// MCP Server Stack - Lambda with Function URL for MCP server
 const mcpServerStack = new MCPServerStack(
   app,
   `${envConfig.prefix}-server-archil-io-${envConfig.stage}`,
   {
     envConfig,
+    resumeBucket: resumeBucketStack.bucket,
     env: {
       account: envConfig.accountId,
       region: envConfig.region,

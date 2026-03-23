@@ -1,8 +1,11 @@
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Request, Response } from "express";
-import serverlessExpress from "@codegenie/serverless-express";
+import * as serverlessExpressModule from "@codegenie/serverless-express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import "source-map-support/register.js";
+
+const serverlessExpress =
+  (serverlessExpressModule as any).default || serverlessExpressModule;
 
 import { createMCPServer } from "./server.js";
 

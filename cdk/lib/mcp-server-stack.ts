@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -9,6 +10,7 @@ import type { EnvironmentConfig } from "../config/environments.js";
 
 interface MCPServerStackProps extends cdk.StackProps {
   envConfig: EnvironmentConfig;
+  resumeBucket: s3.IBucket;
 }
 
 export class MCPServerStack extends cdk.Stack {
@@ -17,7 +19,7 @@ export class MCPServerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: MCPServerStackProps) {
     super(scope, id, props);
 
-    const { envConfig } = props;
+    const { envConfig, resumeBucket } = props;
 
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,9 +36,14 @@ export class MCPServerStack extends cdk.Stack {
       architecture: Architecture.X86_64,
       environment: {
         NODE_ENV: "production",
+        RESUME_BUCKET_NAME: resumeBucket.bucketName,
+        RESUME_PDF_KEY: "archil-l-resume.pdf",
       },
       logRetention: envConfig.logRetentionDays,
     });
+
+    // Grant Lambda read access to the resume bucket
+    resumeBucket.grantRead(mcpServerFunction);
 
     // Add Function URL with streaming enabled
     this.functionUrl = mcpServerFunction.addFunctionUrl({

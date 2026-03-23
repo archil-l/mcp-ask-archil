@@ -14,6 +14,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/apps/**/src/**/*"]
+  "include": ["src/apps/**/*"],
+  "exclude": ["node_modules"]
 }
