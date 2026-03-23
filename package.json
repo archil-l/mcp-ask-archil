@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "npm run build:apps && tsc && node esbuild.config.mjs && tsc -p cdk/tsconfig.json && npx cdk synth",
+    "build": "npm run build:apps && node esbuild.config.mjs && tsc -p cdk/tsconfig.json && npx cdk synth",
     "build:cdk": "tsc -p cdk/tsconfig.json",
     "build:apps": "npm run build:app:get-resume",
     "build:app:get-resume": "cd src/apps/get-resume && cross-env INPUT=get-resume-app.html vite build",
@@ -41,6 +41,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@types/vite": "",
     "aws-cdk": "2.1106.0",
     "aws-cdk-lib": "^2.241.0",
     "concurrently": "^9.2.1",
