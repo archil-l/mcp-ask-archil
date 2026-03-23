@@ -11,11 +11,10 @@ import type {
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 // Works both from source (.ts) and compiled (dist/)
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIST_DIR = import.meta.filename?.endsWith(".ts")
+const __dirname = path.dirname(__filename);
+const DIST_DIR = __filename.endsWith(".ts")
   ? path.join(__dirname, "dist")
   : __dirname;
 

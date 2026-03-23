@@ -16,7 +16,7 @@ const buildConfig = {
   bundle: true,
   platform: "node",
   target: "node24",
-  format: "esm",
+  format: "cjs",
   outfile: "dist/mcp-lambda/index.js",
   sourcemap: true,
   minify: false,
@@ -45,7 +45,7 @@ async function build() {
       name: rootPackageJson.name,
       version: rootPackageJson.version,
       description: rootPackageJson.description,
-      type: "module",
+      type: "commonjs",
       main: "index.js",
       license: rootPackageJson.license,
     };
