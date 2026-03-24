@@ -25,7 +25,7 @@ const s3Client = new S3Client({});
  */
 async function fetchResumePdf(): Promise<string> {
   const bucketName =
-    process.env.RESUME_BUCKET_NAME || "mcp-archil-io-resume-prod";
+    process.env.RESUME_BUCKET_NAME || "mcp-ask-archil-bucket-prod";
   const pdfKey = process.env.RESUME_PDF_KEY || "archil-l-resume.pdf";
 
   const command = new GetObjectCommand({

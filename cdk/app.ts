@@ -4,7 +4,7 @@ import * as cdk from "aws-cdk-lib";
 import { GitHubOidcStack } from "./lib/github-oidc-stack.js";
 import { SubdomainStack } from "./lib/subdomain-stack.js";
 import { MCPServerStack } from "./lib/mcp-server-stack.js";
-import { ResumeBucketStack } from "./lib/resume-bucket-stack.js";
+import { ResumeBucketStack } from "./lib/mcp-ask-archil-bucket-stack.js";
 import { getEnvironmentConfig, Stage } from "./config/environments.js";
 
 const GITHUB_ORG = "archil-l";
@@ -53,7 +53,7 @@ const subdomainStack = new SubdomainStack(
 // Resume Bucket Stack - S3 bucket for storing resume PDF
 const resumeBucketStack = new ResumeBucketStack(
   app,
-  `${envConfig.prefix}-resume-bucket-${envConfig.stage}`,
+  `mcp-ask-archil-bucket-${envConfig.stage}`,
   {
     envConfig,
     env: {

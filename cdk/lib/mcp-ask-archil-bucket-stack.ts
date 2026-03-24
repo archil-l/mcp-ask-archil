@@ -16,8 +16,8 @@ export class ResumeBucketStack extends cdk.Stack {
     const { envConfig } = props;
 
     // S3 bucket for storing resume PDF
-    this.bucket = new s3.Bucket(this, "resume-bucket", {
-      bucketName: `mcp-archil-io-resume-${envConfig.stage}`,
+    this.bucket = new s3.Bucket(this, "mcp-ask-archil-bucket", {
+      bucketName: `mcp-ask-archil-bucket-${envConfig.stage}`,
       removalPolicy: cdk.RemovalPolicy.RETAIN, // Keep bucket on stack deletion
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Private bucket
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -25,16 +25,16 @@ export class ResumeBucketStack extends cdk.Stack {
     });
 
     // Outputs
-    new cdk.CfnOutput(this, "resume-bucket-name", {
+    new cdk.CfnOutput(this, "mcp-ask-archil-bucket-name", {
       description: "Resume S3 Bucket Name",
       value: this.bucket.bucketName,
-      exportName: `resume-bucket-name-${envConfig.stage}`,
+      exportName: `mcp-ask-archil-bucket-name-${envConfig.stage}`,
     });
 
-    new cdk.CfnOutput(this, "resume-bucket-arn", {
+    new cdk.CfnOutput(this, "mcp-ask-archil-bucket-arn", {
       description: "Resume S3 Bucket ARN",
       value: this.bucket.bucketArn,
-      exportName: `resume-bucket-arn-${envConfig.stage}`,
+      exportName: `mcp-ask-archil-bucket-arn-${envConfig.stage}`,
     });
   }
 }
