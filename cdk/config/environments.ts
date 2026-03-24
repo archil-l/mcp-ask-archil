@@ -35,6 +35,8 @@ export interface EnvironmentConfig {
   parentHostedZoneId?: string;
   /** IAM role ARN for cross-account NS delegation in parent account */
   parentDelegationRoleArn?: string;
+  /** Resume filename */
+  resumePDFFilename: string;
 }
 
 const environments: Record<Stage, EnvironmentConfig> = {
@@ -51,6 +53,7 @@ const environments: Record<Stage, EnvironmentConfig> = {
     parentHostedZoneId: "Z00681622F9CUFDPFSU6B",
     parentDelegationRoleArn:
       "arn:aws:iam::359373592118:role/ask-archil-io-dns-delegation-role",
+    resumePDFFilename: "resume-archil-lelashvili-latest.pdf",
   },
 };
 

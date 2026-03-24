@@ -116,7 +116,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy MCP server stack
-        run: npx cdk deploy mcp-server-archil-io-prod --require-approval never
+        run: npx cdk deploy mcp-server-archil-io-prod mcp-ask-archil-bucket-prod --require-approval never
         env:
           CDK_DEFAULT_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
           CDK_DEFAULT_REGION: ${{ secrets.AWS_REGION }}

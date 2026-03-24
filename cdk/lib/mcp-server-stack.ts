@@ -37,7 +37,7 @@ export class MCPServerStack extends cdk.Stack {
       environment: {
         NODE_ENV: "production",
         RESUME_BUCKET_NAME: resumeBucket.bucketName,
-        RESUME_PDF_KEY: "archil-l-resume.pdf",
+        RESUME_PDF_KEY: envConfig.resumePDFFilename,
       },
       logRetention: envConfig.logRetentionDays,
     });
