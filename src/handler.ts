@@ -1,15 +1,10 @@
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Request, Response } from "express";
-import * as serverlessExpressModule from "@codegenie/serverless-express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import "source-map-support/register.js";
 
-const serverlessExpress =
-  (serverlessExpressModule as any).default || serverlessExpressModule;
-
 import { createMCPServer } from "./server.js";
 
-let serverlessExpressInstance: any;
 const app = createMcpExpressApp({ host: "0.0.0.0" });
 
 app.post("/mcp", async (request: Request, response: Response) => {
@@ -68,13 +63,11 @@ app.delete("/mcp", async (req: Request, res: Response) => {
   );
 });
 
-// Start the server
-const PORT = 3000;
-app.listen(PORT, (error) => {
-  if (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
+// Lambda Web Adapter expects the app to listen on PORT (default 8080)
+// For local development, use PORT 3000
+const PORT = parseInt(process.env.PORT || "3000", 10);
+
+app.listen(PORT, () => {
   console.log(`MCP Stateless Streamable HTTP Server listening on port ${PORT}`);
 });
 
@@ -83,17 +76,3 @@ process.on("SIGINT", async () => {
   // eslint-disable-next-line unicorn/no-process-exit
   process.exit(0);
 });
-
-async function setup(event: any, context: any) {
-  serverlessExpressInstance = serverlessExpress({ app });
-  return serverlessExpressInstance(event, context);
-}
-
-function handler(event: any, context: any) {
-  if (serverlessExpressInstance)
-    return serverlessExpressInstance(event, context);
-
-  return setup(event, context);
-}
-
-export { handler };
