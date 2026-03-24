@@ -7,6 +7,9 @@
  * 2. Signs requests with AWS SigV4 credentials
  * 3. Forwards them to the Lambda function URL
  * 4. Streams responses back to the inspector
+ *
+ * Note: With Lambda Web Adapter, responses are streamed directly without
+ * JSON envelope wrapping, so we just pass through the raw response.
  */
 
 import express from "express";
@@ -88,33 +91,11 @@ app.use(async (req, res) => {
 
     res.status(response.status);
 
-    // Helper function to unwrap Lambda response envelope if present
-    const unwrapLambdaResponse = (
-      data: string,
-    ): { body: string; statusCode?: number } => {
-      try {
-        const parsed = JSON.parse(data);
-        if (
-          parsed &&
-          typeof parsed.statusCode === "number" &&
-          typeof parsed.body === "string"
-        ) {
-          console.log(
-            `[PROXY] Unwrapping Lambda envelope (statusCode: ${parsed.statusCode})`,
-          );
-          return { body: parsed.body, statusCode: parsed.statusCode };
-        }
-      } catch {
-        // Not JSON or not a Lambda envelope, use as-is
-      }
-      return { body: data };
-    };
-
     // Check if it's a streaming response
     const contentType = response.headers.get("content-type") || "";
 
     if (contentType.includes("text/event-stream") && response.body) {
-      // Stream the response
+      // Stream the response directly (Lambda Web Adapter sends raw SSE)
       res.setHeader("content-type", "text/event-stream");
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -125,38 +106,34 @@ app.use(async (req, res) => {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          console.log(`[PROXY] Streaming chunk: ${chunk.substring(0, 100)}...`);
-
-          // Check if the chunk is a Lambda envelope
-          const unwrapped = unwrapLambdaResponse(chunk);
-          if (unwrapped.statusCode) {
-            res.status(unwrapped.statusCode);
+          // Only log a brief summary to avoid flooding the console
+          if (chunk.length < 200) {
+            console.log(`[PROXY] SSE chunk: ${chunk.replace(/\n/g, "\\n")}`);
+          } else {
+            console.log(
+              `[PROXY] SSE chunk: ${chunk.substring(0, 100).replace(/\n/g, "\\n")}... (${chunk.length} bytes)`,
+            );
           }
-          res.write(unwrapped.body);
+          res.write(chunk);
         }
       } finally {
         reader.releaseLock();
       }
+      console.log(`[PROXY] Stream completed`);
       res.end();
     } else {
-      // Non-streaming response
+      // Non-streaming response - pass through directly
       const responseBody = await response.text();
       console.log(
         `[PROXY] Response body: ${responseBody.substring(0, 200)}${responseBody.length > 200 ? "..." : ""}`,
       );
 
-      // Check if the response is a Lambda envelope
-      const unwrapped = unwrapLambdaResponse(responseBody);
-      if (unwrapped.statusCode) {
-        res.status(unwrapped.statusCode);
-      }
-
-      // Check if the unwrapped body is SSE format
-      if (unwrapped.body.startsWith("event:")) {
+      // Check if the response is SSE format (for small responses that don't stream)
+      if (responseBody.startsWith("event:")) {
         res.setHeader("content-type", "text/event-stream");
       }
 
-      res.send(unwrapped.body);
+      res.send(responseBody);
     }
   } catch (error) {
     console.error("[PROXY] Error:", error);

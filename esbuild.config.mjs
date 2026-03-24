@@ -1,5 +1,11 @@
 import * as esbuild from "esbuild";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  copyFileSync,
+  chmodSync,
+} from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
@@ -58,6 +64,15 @@ async function build() {
     );
 
     console.log("\n📄 Created minimal package.json for Lambda");
+
+    // Copy run.sh bootstrap script for Lambda Web Adapter
+    const runShSrc = join(__dirname, "src/run.sh");
+    const runShDest = join(outputDir, "run.sh");
+    copyFileSync(runShSrc, runShDest);
+    // Make run.sh executable
+    chmodSync(runShDest, 0o755);
+    console.log("📜 Copied run.sh bootstrap script");
+
     console.log("\n✅ Build completed successfully!");
   } catch (error) {
     console.error("❌ Build failed:", error);
