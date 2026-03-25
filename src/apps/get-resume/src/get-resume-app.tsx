@@ -191,16 +191,49 @@ function ResumeViewerInner({
     setScale(1.0);
   }, []);
 
-  const handleDownload = useCallback(() => {
-    if (!pdfDataUrl || !resumeData) return;
+  const handleDownload = useCallback(async () => {
+    if (!resumeData?.pdfBase64) return;
 
-    const link = document.createElement("a");
-    link.href = pdfDataUrl;
-    link.download = resumeData.filename ?? "resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [pdfDataUrl, resumeData]);
+    // Check if host supports downloadFile capability
+    const hostCapabilities = app.getHostCapabilities();
+    if (hostCapabilities?.downloadFile) {
+      try {
+        // Use MCP Apps SDK downloadFile API for sandbox-compatible download
+        await app.downloadFile({
+          contents: [
+            {
+              type: "resource",
+              resource: {
+                uri: `file:///${resumeData.filename ?? "resume.pdf"}`,
+                mimeType: "application/pdf",
+                blob: resumeData.pdfBase64,
+              },
+            },
+          ],
+        });
+        return;
+      } catch (err) {
+        console.error("downloadFile failed, trying fallback:", err);
+      }
+    }
+
+    // Fallback: Try native download link approach
+    try {
+      const link = document.createElement("a");
+      link.href = `data:application/pdf;base64,${resumeData.pdfBase64}`;
+      link.download = resumeData.filename ?? "resume.pdf";
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Native download failed:", err);
+      // Final fallback: Alert user with instructions
+      alert(
+        "Download not supported in this environment. Right-click on the PDF and select 'Save as' or use your browser's print function (Ctrl/Cmd+P) to save as PDF.",
+      );
+    }
+  }, [app, resumeData]);
 
   const handleRefresh = useCallback(async () => {
     try {
@@ -480,8 +513,8 @@ function ResumeViewerInner({
                     Loading page...
                   </div>
                 }
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
               />
             </Document>
           </div>
