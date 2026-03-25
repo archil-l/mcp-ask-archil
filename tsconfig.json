@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -11,10 +12,11 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@/*": ["./src/*"]
     },
     "types": ["vite/client"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/apps/**/src/**/*"]
+  "exclude": ["node_modules"]
 }
