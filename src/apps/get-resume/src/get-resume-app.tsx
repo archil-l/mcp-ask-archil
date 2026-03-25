@@ -1,24 +1,23 @@
 /**
  * @file React PDF viewer MCP App for displaying resume from S3.
- * Uses react-pdf for rendering PDFs on canvas (works in iframe contexts).
+ * Uses the PDFViewer component for minimalistic rendering.
  */
 import type { App, McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import { useApp } from "@modelcontextprotocol/ext-apps/react";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import {
-  StrictMode,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  useRef,
-} from "react";
+import { StrictMode, useCallback, useEffect, useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { Document, Page, pdfjs } from "react-pdf";
-import "./global.css";
-
-// Configure PDF.js worker from CDN (works with single-file builds)
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import { Download, RefreshCw } from "lucide-react";
+import { PDFViewer } from "@/components/pdf-viewer/pdf-viewer.js";
+import { Button } from "@/components/ui/button.js";
+import { Spinner } from "@/components/ui/spinner.js";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.js";
+import "@/styles/globals.css";
 
 interface ResumeData {
   pdfBase64?: string;
@@ -64,7 +63,7 @@ function ResumeViewerApp() {
           setError(
             errorText?.type === "text"
               ? errorText.text
-              : "Failed to load resume",
+              : "Failed to load resume"
           );
         } else {
           setError(null);
@@ -96,16 +95,21 @@ function ResumeViewerApp() {
 
   if (connectionError) {
     return (
-      <div style={{ padding: "20px", color: "red" }}>
-        <strong>Connection Error:</strong> {connectionError.message}
+      <div className="flex h-full items-center justify-center p-5">
+        <p className="text-destructive">
+          <strong>Connection Error:</strong> {connectionError.message}
+        </p>
       </div>
     );
   }
 
   if (!app) {
     return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <p>Connecting to host...</p>
+      <div className="flex h-full items-center justify-center p-5">
+        <div className="flex items-center gap-3">
+          <Spinner className="size-5" />
+          <p className="text-muted-foreground">Connecting to host...</p>
+        </div>
       </div>
     );
   }
@@ -136,12 +140,6 @@ function ResumeViewerInner({
   isLoading,
   error,
 }: ResumeViewerInnerProps) {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [scale, setScale] = useState<number>(1.0);
-  const [pdfError, setPdfError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const resumeData = useMemo(() => {
     if (!toolResult || toolResult.isError) return null;
     return extractResumeData(toolResult);
@@ -152,53 +150,12 @@ function ResumeViewerInner({
     return `data:application/pdf;base64,${resumeData.pdfBase64}`;
   }, [resumeData]);
 
-  // Reset page number when PDF changes
-  useEffect(() => {
-    setPageNumber(1);
-    setPdfError(null);
-  }, [pdfDataUrl]);
-
-  const onDocumentLoadSuccess = useCallback(
-    ({ numPages }: { numPages: number }) => {
-      setNumPages(numPages);
-      setPdfError(null);
-    },
-    [],
-  );
-
-  const onDocumentLoadError = useCallback((err: Error) => {
-    console.error("PDF load error:", err);
-    setPdfError(err.message);
-  }, []);
-
-  const goToPrevPage = useCallback(() => {
-    setPageNumber((prev) => Math.max(1, prev - 1));
-  }, []);
-
-  const goToNextPage = useCallback(() => {
-    setPageNumber((prev) => Math.min(numPages, prev + 1));
-  }, [numPages]);
-
-  const zoomIn = useCallback(() => {
-    setScale((prev) => Math.min(3.0, prev + 0.25));
-  }, []);
-
-  const zoomOut = useCallback(() => {
-    setScale((prev) => Math.max(0.5, prev - 0.25));
-  }, []);
-
-  const resetZoom = useCallback(() => {
-    setScale(1.0);
-  }, []);
-
   const handleDownload = useCallback(async () => {
     if (!resumeData?.pdfBase64) return;
 
-    // Check if host supports downloadFile capability
     const hostCapabilities = app.getHostCapabilities();
     if (hostCapabilities?.downloadFile) {
       try {
-        // Use MCP Apps SDK downloadFile API for sandbox-compatible download
         await app.downloadFile({
           contents: [
             {
@@ -217,7 +174,6 @@ function ResumeViewerInner({
       }
     }
 
-    // Fallback: Try native download link approach
     try {
       const link = document.createElement("a");
       link.href = `data:application/pdf;base64,${resumeData.pdfBase64}`;
@@ -228,9 +184,8 @@ function ResumeViewerInner({
       document.body.removeChild(link);
     } catch (err) {
       console.error("Native download failed:", err);
-      // Final fallback: Alert user with instructions
       alert(
-        "Download not supported in this environment. Right-click on the PDF and select 'Save as' or use your browser's print function (Ctrl/Cmd+P) to save as PDF.",
+        "Download not supported in this environment. Right-click on the PDF and select 'Save as' or use your browser's print function (Ctrl/Cmd+P) to save as PDF."
       );
     }
   }, [app, resumeData]);
@@ -243,335 +198,116 @@ function ResumeViewerInner({
     }
   }, [app]);
 
-  const displayError = error || pdfError;
-
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100%",
-        paddingTop: hostContext?.safeAreaInsets?.top,
-        paddingRight: hostContext?.safeAreaInsets?.right,
-        paddingBottom: hostContext?.safeAreaInsets?.bottom,
-        paddingLeft: hostContext?.safeAreaInsets?.left,
-      }}
-    >
-      {/* Header */}
-      <header
+    <TooltipProvider>
+      <main
+        className="flex h-full w-full flex-col bg-background"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "12px 16px",
-          borderBottom: "1px solid var(--color-ring-primary, #e5e7eb)",
-          backgroundColor: "var(--color-background-primary)",
-          flexWrap: "wrap",
-          gap: "8px",
+          paddingTop: hostContext?.safeAreaInsets?.top,
+          paddingRight: hostContext?.safeAreaInsets?.right,
+          paddingBottom: hostContext?.safeAreaInsets?.bottom,
+          paddingLeft: hostContext?.safeAreaInsets?.left,
         }}
       >
-        <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 600 }}>
-          📄 {resumeData?.filename ?? "Resume Viewer"}
-        </h1>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-ring-primary, #d1d5db)",
-              backgroundColor: "var(--color-background-primary)",
-              cursor: isLoading ? "not-allowed" : "pointer",
-              opacity: isLoading ? 0.6 : 1,
-            }}
-          >
-            🔄 Refresh
-          </button>
-          {pdfDataUrl && (
-            <button
-              onClick={handleDownload}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "6px",
-                border: "none",
-                backgroundColor: "var(--color-accent, #2563eb)",
-                color: "var(--color-text-on-accent, white)",
-                cursor: "pointer",
-              }}
-            >
-              ⬇️ Download
-            </button>
+        {/* Minimal header */}
+        <header className="flex items-center justify-between border-b px-4 py-2">
+          <h1 className="truncate text-sm font-medium text-foreground">
+            {resumeData?.filename ?? "Resume"}
+          </h1>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                >
+                  <RefreshCw
+                    className={`size-4 ${isLoading ? "animate-spin" : ""}`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Refresh</TooltipContent>
+            </Tooltip>
+
+            {pdfDataUrl && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleDownload}
+                  >
+                    <Download className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        </header>
+
+        {/* Content area */}
+        <div className="relative flex-1 overflow-hidden">
+          {/* Loading state */}
+          {isLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
+              <div className="flex flex-col items-center gap-3">
+                <Spinner className="size-8" />
+                <p className="text-sm text-muted-foreground">
+                  Loading resume...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !isLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
+              <div className="flex max-w-sm flex-col items-center gap-4 p-6 text-center">
+                <div className="text-4xl">⚠️</div>
+                <p className="text-sm text-destructive">{error}</p>
+                <Button variant="outline" size="sm" onClick={handleRefresh}>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!pdfDataUrl && !isLoading && !error && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
+              <div className="flex flex-col items-center gap-4 p-6 text-center">
+                <div className="text-5xl">📄</div>
+                <div>
+                  <h2 className="text-lg font-medium">No Resume Loaded</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Click below to load the resume
+                  </p>
+                </div>
+                <Button onClick={handleRefresh}>Load Resume</Button>
+              </div>
+            </div>
+          )}
+
+          {/* PDF Viewer */}
+          {pdfDataUrl && !isLoading && !error && (
+            <PDFViewer
+              pdfDataUrl={pdfDataUrl}
+              showPagination={true}
+              showZoomOnHover={true}
+              className="h-full"
+            />
           )}
         </div>
-      </header>
-
-      {/* PDF Controls */}
-      {pdfDataUrl && !isLoading && !displayError && numPages > 0 && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "8px 16px",
-            borderBottom: "1px solid var(--color-ring-primary, #e5e7eb)",
-            backgroundColor: "var(--color-background-secondary, #f9fafb)",
-            gap: "16px",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Pagination */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button
-              onClick={goToPrevPage}
-              disabled={pageNumber <= 1}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "1px solid var(--color-ring-primary, #d1d5db)",
-                backgroundColor: "var(--color-background-primary)",
-                cursor: pageNumber <= 1 ? "not-allowed" : "pointer",
-                opacity: pageNumber <= 1 ? 0.5 : 1,
-              }}
-            >
-              ◀ Prev
-            </button>
-            <span style={{ minWidth: "100px", textAlign: "center" }}>
-              Page {pageNumber} of {numPages}
-            </span>
-            <button
-              onClick={goToNextPage}
-              disabled={pageNumber >= numPages}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "1px solid var(--color-ring-primary, #d1d5db)",
-                backgroundColor: "var(--color-background-primary)",
-                cursor: pageNumber >= numPages ? "not-allowed" : "pointer",
-                opacity: pageNumber >= numPages ? 0.5 : 1,
-              }}
-            >
-              Next ▶
-            </button>
-          </div>
-
-          {/* Zoom Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button
-              onClick={zoomOut}
-              disabled={scale <= 0.5}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "1px solid var(--color-ring-primary, #d1d5db)",
-                backgroundColor: "var(--color-background-primary)",
-                cursor: scale <= 0.5 ? "not-allowed" : "pointer",
-                opacity: scale <= 0.5 ? 0.5 : 1,
-              }}
-            >
-              ➖
-            </button>
-            <button
-              onClick={resetZoom}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "1px solid var(--color-ring-primary, #d1d5db)",
-                backgroundColor: "var(--color-background-primary)",
-                cursor: "pointer",
-                minWidth: "60px",
-              }}
-            >
-              {Math.round(scale * 100)}%
-            </button>
-            <button
-              onClick={zoomIn}
-              disabled={scale >= 3.0}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "1px solid var(--color-ring-primary, #d1d5db)",
-                backgroundColor: "var(--color-background-primary)",
-                cursor: scale >= 3.0 ? "not-allowed" : "pointer",
-                opacity: scale >= 3.0 ? 0.5 : 1,
-              }}
-            >
-              ➕
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <div
-        ref={containerRef}
-        style={{
-          flex: 1,
-          overflow: "auto",
-          position: "relative",
-          backgroundColor: "#525659",
-        }}
-      >
-        {isLoading && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "var(--color-background-primary)",
-            }}
-          >
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  border: "4px solid var(--color-ring-primary, #e5e7eb)",
-                  borderTopColor: "var(--color-accent, #2563eb)",
-                  borderRadius: "50%",
-                  animation: "spin 1s linear infinite",
-                  margin: "0 auto 16px",
-                }}
-              />
-              <p>Loading resume...</p>
-            </div>
-          </div>
-        )}
-
-        {displayError && !isLoading && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "var(--color-background-primary)",
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                padding: "24px",
-                maxWidth: "400px",
-              }}
-            >
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>❌</div>
-              <h2 style={{ marginBottom: "8px", color: "#dc2626" }}>Error</h2>
-              <p
-                style={{
-                  color: "var(--color-text-primary)",
-                  marginBottom: "16px",
-                }}
-              >
-                {displayError}
-              </p>
-              <button
-                onClick={handleRefresh}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  border: "none",
-                  backgroundColor: "var(--color-accent, #2563eb)",
-                  color: "var(--color-text-on-accent, white)",
-                  cursor: "pointer",
-                }}
-              >
-                Try Again
-              </button>
-            </div>
-          </div>
-        )}
-
-        {pdfDataUrl && !isLoading && !displayError && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "20px",
-              minHeight: "100%",
-            }}
-          >
-            <Document
-              file={pdfDataUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              loading={
-                <div style={{ color: "white", padding: "20px" }}>
-                  Loading PDF...
-                </div>
-              }
-            >
-              <Page
-                pageNumber={pageNumber}
-                scale={scale}
-                loading={
-                  <div style={{ color: "white", padding: "20px" }}>
-                    Loading page...
-                  </div>
-                }
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            </Document>
-          </div>
-        )}
-
-        {!pdfDataUrl && !isLoading && !displayError && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "var(--color-background-primary)",
-            }}
-          >
-            <div style={{ textAlign: "center", padding: "24px" }}>
-              <div style={{ fontSize: "64px", marginBottom: "16px" }}>📄</div>
-              <h2 style={{ marginBottom: "8px" }}>No Resume Loaded</h2>
-              <p
-                style={{
-                  color: "var(--color-text-primary)",
-                  marginBottom: "16px",
-                }}
-              >
-                Click the button below to load the resume.
-              </p>
-              <button
-                onClick={handleRefresh}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  border: "none",
-                  backgroundColor: "var(--color-accent, #2563eb)",
-                  color: "var(--color-text-on-accent, white)",
-                  cursor: "pointer",
-                }}
-              >
-                Load Resume
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Spinner animation */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </main>
+      </main>
+    </TooltipProvider>
   );
 }
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ResumeViewerApp />
-  </StrictMode>,
+  </StrictMode>
 );
