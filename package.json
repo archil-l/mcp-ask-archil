@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "npm run build:apps && node esbuild.config.mjs && tsc -p cdk/tsconfig.json && npx cdk synth",
+    "build": "npm run typecheck && npm run build:apps && node esbuild.config.mjs && tsc -p cdk/tsconfig.json && npx cdk synth",
     "build:cdk": "tsc -p cdk/tsconfig.json",
     "build:apps": "npm run build:app:get-resume",
     "build:app:get-resume": "cd src/apps/get-resume && cross-env INPUT=get-resume-app.html vite build",
