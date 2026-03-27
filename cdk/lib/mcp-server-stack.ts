@@ -87,6 +87,7 @@ export class MCPServerStack extends cdk.Stack {
 
     // Grant the client access role permission to invoke the MCP server function
     mcpServerFunction.grantInvoke(clientAccessRole);
+    mcpServerFunction.grantInvokeUrl(clientAccessRole);
 
     // Outputs with CloudFormation exports for cross-stack references
     new cdk.CfnOutput(this, "mcp-server-function-url", {
