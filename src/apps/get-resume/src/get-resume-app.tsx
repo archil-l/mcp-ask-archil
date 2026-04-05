@@ -25,11 +25,27 @@ interface ResumeData {
 }
 
 function extractResumeData(result: CallToolResult): ResumeData {
+  console.group('🔍 extractResumeData()');
+  console.log('Input CallToolResult:', result);
+  console.log('  isError:', result.isError);
+  console.log('  content items:', result.content?.length ?? 0);
+  console.log('  structuredContent exists:', !!result.structuredContent);
+  
   const structured = result.structuredContent as ResumeData | undefined;
-  return {
+  
+  const extracted = {
     pdfBase64: structured?.pdfBase64,
     filename: structured?.filename ?? "resume.pdf",
   };
+
+  console.log('Extracted ResumeData:', extracted);
+  console.log('  pdfBase64 length:', extracted.pdfBase64?.length ?? 'MISSING');
+  if (!extracted.pdfBase64) {
+    console.warn('⚠️ No pdfBase64 found in tool result!');
+  }
+  console.groupEnd();
+
+  return extracted;
 }
 
 function ResumeViewerApp() {
@@ -55,19 +71,36 @@ function ResumeViewerApp() {
       };
 
       app.ontoolresult = async (result) => {
-        console.info("Received tool call result:", result);
+        console.group('📥 ontoolresult EVENT');
+        console.info('Received raw tool call result at:', new Date().toISOString());
+        console.log('Full result object:', result);
+        console.log('Result properties:');
+        console.log('  isError:', result.isError);
+        console.log('  content:', result.content);
+        console.log('  structuredContent:', result.structuredContent);
+        console.log('  content types:', result.content?.map(c => c.type));
+        
+        console.log('⚡ Updating state:');
+        console.log('  - setToolResult with received value');
+        console.log('  - setIsLoading(false)');
+        
         setToolResult(result);
         setIsLoading(false);
+        
         if (result.isError) {
+          console.warn('❌ Result is marked as error');
           const errorText = result.content?.find((c) => c.type === "text");
-          setError(
-            errorText?.type === "text"
-              ? errorText.text
-              : "Failed to load resume"
-          );
+          const errorMessage = errorText?.type === "text"
+            ? errorText.text
+            : "Failed to load resume";
+          console.log('Setting error message:', errorMessage);
+          setError(errorMessage);
         } else {
+          console.log('✅ Result successful, clearing error state');
           setError(null);
         }
+        
+        console.groupEnd();
       };
 
       app.ontoolcancelled = (params) => {
@@ -141,13 +174,45 @@ function ResumeViewerInner({
   error,
 }: ResumeViewerInnerProps) {
   const resumeData = useMemo(() => {
-    if (!toolResult || toolResult.isError) return null;
-    return extractResumeData(toolResult);
+    console.group('🧠 resumeData useMemo RECALCULATED');
+    console.log('ToolResult changed:', !!toolResult);
+    
+    if (!toolResult) {
+      console.log('❌ No toolResult available, returning null');
+      console.groupEnd();
+      return null;
+    }
+    
+    if (toolResult.isError) {
+      console.log('❌ toolResult is error, returning null');
+      console.groupEnd();
+      return null;
+    }
+    
+    const data = extractResumeData(toolResult);
+    console.log('✅ Extracted resume data:', data);
+    console.groupEnd();
+    
+    return data;
   }, [toolResult]);
 
+
   const pdfDataUrl = useMemo(() => {
-    if (!resumeData?.pdfBase64) return null;
-    return `data:application/pdf;base64,${resumeData.pdfBase64}`;
+    console.group('🧠 pdfDataUrl useMemo RECALCULATED');
+    console.log('ResumeData changed:', !!resumeData);
+    
+    if (!resumeData?.pdfBase64) {
+      console.log('❌ No pdfBase64 available, returning null');
+      console.groupEnd();
+      return null;
+    }
+    
+    console.log('✅ Generating data URL with base64 length:', resumeData.pdfBase64.length);
+    const url = `data:application/pdf;base64,${resumeData.pdfBase64}`;
+    console.log('Generated URL length:', url.length);
+    console.groupEnd();
+    
+    return url;
   }, [resumeData]);
 
   const handleDownload = useCallback(async () => {
@@ -197,6 +262,24 @@ function ResumeViewerInner({
       console.error("Failed to refresh resume:", err);
     }
   }, [app]);
+
+  // Render logging
+  console.group('🎨 RENDERING ResumeViewerInner');
+  console.log('State values:');
+  console.log('  isLoading:', isLoading);
+  console.log('  error:', error);
+  console.log('  has toolResult:', !!toolResult);
+  console.log('  has resumeData:', !!resumeData);
+  console.log('  has pdfDataUrl:', !!pdfDataUrl);
+  
+  let renderState = 'unknown';
+  if (isLoading) renderState = 'LOADING';
+  else if (error) renderState = 'ERROR';
+  else if (!pdfDataUrl) renderState = 'EMPTY';
+  else renderState = 'PDF_VIEWER';
+  
+  console.log('✅ Selected render branch:', renderState);
+  console.groupEnd();
 
   return (
     <TooltipProvider>
