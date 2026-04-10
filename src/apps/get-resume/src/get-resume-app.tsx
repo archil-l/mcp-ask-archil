@@ -3,7 +3,7 @@
  * Uses the PDFViewer component for minimalistic rendering.
  */
 import type { App, McpUiHostContext } from "@modelcontextprotocol/ext-apps";
-import { useApp } from "@modelcontextprotocol/ext-apps/react";
+import { useApp, useHostStyles } from "@modelcontextprotocol/ext-apps/react";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { StrictMode, useCallback, useEffect, useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
@@ -173,6 +173,8 @@ function ResumeViewerInner({
   isLoading,
   error,
 }: ResumeViewerInnerProps) {
+  useHostStyles(app, app.getHostContext());
+
   const resumeData = useMemo(() => {
     console.group('🧠 resumeData useMemo RECALCULATED');
     console.log('ToolResult changed:', !!toolResult);
