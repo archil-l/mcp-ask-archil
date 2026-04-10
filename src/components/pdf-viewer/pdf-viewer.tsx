@@ -16,8 +16,10 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area.js";
 import { cn } from "@/lib/utils.js";
 
-// Configure PDF.js worker from CDN
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Configure PDF.js worker — use local bundle so it works inside a sandboxed iframe
+// without CDN access. viteSingleFile inlines this as a data: URI at build time.
+import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export interface PDFViewerProps {
   /** PDF data URL (data:application/pdf;base64,...) or file URL */
