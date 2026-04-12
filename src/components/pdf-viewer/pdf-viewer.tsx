@@ -18,8 +18,19 @@ import { cn } from "@/lib/utils.js";
 
 // Configure PDF.js worker — use local bundle so it works inside a sandboxed iframe
 // without CDN access. viteSingleFile inlines this as a data: URI at build time.
+// Wrap in a blob: URL because browsers block data: workers from null-origin srcdoc iframes.
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+function toBlob(src: string): string {
+  if (src.startsWith("data:")) {
+    // Extract the base64 payload and decode it into a Blob
+    const [header, b64] = src.split(",", 2);
+    const mime = header.slice(5, header.indexOf(";"));
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    return URL.createObjectURL(new Blob([bytes], { type: mime }));
+  }
+  return src;
+}
+pdfjs.GlobalWorkerOptions.workerSrc = toBlob(workerSrc);
 
 export interface PDFViewerProps {
   /** PDF data URL (data:application/pdf;base64,...) or file URL */

@@ -13,9 +13,11 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export default defineConfig({
   plugins: [tailwindcss(), react(), viteSingleFile()],
   build: {
+    assetsInlineLimit: Infinity,
     sourcemap: isDevelopment ? "inline" : undefined,
     cssMinify: !isDevelopment,
     minify: !isDevelopment,
+    cssCodeSplit: false,
 
     rollupOptions: {
       input: INPUT,
