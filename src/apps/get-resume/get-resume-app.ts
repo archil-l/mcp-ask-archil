@@ -63,23 +63,11 @@ export function registerGetResumeApp(server: McpServer): void {
     async (): Promise<CallToolResult> => {
       try {
         const pdfBase64 = await fetchResumePdf();
-        const html = await fs.readFile(
-          path.join(DIST_DIR, "get-resume-app.html"),
-          "utf-8",
-        );
         return {
           content: [
             {
               type: "text",
               text: "Resume PDF loaded successfully. Displaying in viewer.",
-            },
-            {
-              type: "resource",
-              resource: {
-                uri: resourceUri,
-                mimeType: RESOURCE_MIME_TYPE,
-                text: html,
-              },
             },
           ],
           structuredContent: {
