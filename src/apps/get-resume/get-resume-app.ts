@@ -9,7 +9,7 @@ import type {
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { PDFParse } from "pdf-parse";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -20,6 +20,18 @@ const DIST_DIR = __filename.endsWith(".ts")
   : __dirname;
 
 const s3Client = new S3Client({});
+
+async function extractPdfText(buffer: Buffer): Promise<string> {
+  const pdf = await getDocument({ data: new Uint8Array(buffer) }).promise;
+  const pages = await Promise.all(
+    Array.from({ length: pdf.numPages }, (_, i) =>
+      pdf.getPage(i + 1).then((page) => page.getTextContent()),
+    ),
+  );
+  return pages
+    .flatMap((content) => content.items.map((item) => ("str" in item ? item.str : "")))
+    .join(" ");
+}
 
 /**
  * Fetches the resume PDF from S3 and returns it as base64
@@ -65,7 +77,7 @@ export function registerGetResumeApp(server: McpServer): void {
       try {
         const pdfBuffer = await fetchResumePdf();
         const pdfBase64 = pdfBuffer.toString("base64");
-        const { text: resumeText } = await new PDFParse({ data: pdfBuffer }).getText();
+        const resumeText = await extractPdfText(pdfBuffer);
         return {
           content: [
             {
