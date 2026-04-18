@@ -9,7 +9,7 @@ import type {
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { extractText } from "unpdf";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -22,15 +22,8 @@ const DIST_DIR = __filename.endsWith(".ts")
 const s3Client = new S3Client({});
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
-  const pdf = await getDocument({ data: new Uint8Array(buffer) }).promise;
-  const pages = await Promise.all(
-    Array.from({ length: pdf.numPages }, (_, i) =>
-      pdf.getPage(i + 1).then((page) => page.getTextContent()),
-    ),
-  );
-  return pages
-    .flatMap((content) => content.items.map((item) => ("str" in item ? item.str : "")))
-    .join(" ");
+  const { text } = await extractText(new Uint8Array(buffer), { mergePages: true });
+  return text as string;
 }
 
 /**
