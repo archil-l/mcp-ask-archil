@@ -54,7 +54,7 @@ export function registerGetResumeApp(server: McpServer): void {
     server,
     "get-resume",
     {
-      title: "Get Resume",
+      title: "Archil's Resume",
       description:
         "Displays Archil Lelashvili's resume as an interactive PDF viewer.",
       inputSchema: {},
