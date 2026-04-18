@@ -205,45 +205,6 @@ function ResumeViewerInner({
           paddingLeft: hostContext?.safeAreaInsets?.left,
         }}
       >
-        {/* Minimal header */}
-        <header className="flex items-center justify-between border-b px-4 py-2">
-          <h1 className="truncate text-sm font-medium text-foreground">
-            {resumeData?.filename ?? "Resume"}
-          </h1>
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleRefresh}
-                  disabled={isLoading}
-                >
-                  <RefreshCw
-                    className={`size-4 ${isLoading ? "animate-spin" : ""}`}
-                  />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Refresh</TooltipContent>
-            </Tooltip>
-
-            {pdfDataUrl && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={handleDownload}
-                  >
-                    <Download className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Download</TooltipContent>
-              </Tooltip>
-            )}
-          </div>
-        </header>
-
         {/* Content area */}
         <div className="relative flex-1 overflow-hidden">
           {/* Loading state */}
@@ -296,6 +257,40 @@ function ResumeViewerInner({
               className="h-full"
             />
           )}
+
+          {/* Floating action buttons */}
+          <div className="absolute right-4 top-4 z-30 flex items-center gap-1 rounded-lg border bg-background/95 p-1 shadow-lg backdrop-blur-sm">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                >
+                  <RefreshCw
+                    className={`size-4 ${isLoading ? "animate-spin" : ""}`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Refresh</TooltipContent>
+            </Tooltip>
+
+            {pdfDataUrl && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleDownload}
+                  >
+                    <Download className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </main>
     </TooltipProvider>
