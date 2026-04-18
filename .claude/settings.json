@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python3 -c ':*)",
       "Bash(python3)",
-      "Read(//Users/achiko/Projects/**)"
+      "Read(//Users/achiko/Projects/**)",
+      "Bash(node -e \"const p = require\\('pdf-parse'\\); console.log\\(typeof p, typeof p.default\\)\")"
     ]
   }
 }

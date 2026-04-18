@@ -9,6 +9,7 @@ import type {
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { PDFParse } from "pdf-parse";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -23,7 +24,7 @@ const s3Client = new S3Client({});
 /**
  * Fetches the resume PDF from S3 and returns it as base64
  */
-async function fetchResumePdf(): Promise<string> {
+async function fetchResumePdf(): Promise<Buffer> {
   const bucketName =
     process.env.RESUME_BUCKET_NAME || "mcp-ask-archil-bucket-prod";
   const pdfKey = process.env.RESUME_PDF_KEY || "archil-l-resume.pdf";
@@ -40,7 +41,7 @@ async function fetchResumePdf(): Promise<string> {
   }
 
   const bytes = await response.Body.transformToByteArray();
-  return Buffer.from(bytes).toString("base64");
+  return Buffer.from(bytes);
 }
 
 /**
@@ -62,7 +63,9 @@ export function registerGetResumeApp(server: McpServer): void {
     },
     async (): Promise<CallToolResult> => {
       try {
-        const pdfBase64 = await fetchResumePdf();
+        const pdfBuffer = await fetchResumePdf();
+        const pdfBase64 = pdfBuffer.toString("base64");
+        const { text: resumeText } = await new PDFParse({ data: pdfBuffer }).getText();
         return {
           content: [
             {
@@ -73,6 +76,7 @@ export function registerGetResumeApp(server: McpServer): void {
           structuredContent: {
             pdfBase64,
             filename: "archil-l-resume.pdf",
+            resumeText,
           },
         };
       } catch (error) {
