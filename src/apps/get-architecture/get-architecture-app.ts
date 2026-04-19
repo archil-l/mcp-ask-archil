@@ -23,9 +23,9 @@ export function registerGetArchitectureApp(server: McpServer): void {
     server,
     "get-architecture",
     {
-      title: "How This Is Built",
+      title: "ask.archil.io — Architecture Deep Dive",
       description:
-        "Shows an interactive diagram of ask.archil.io: the two AWS Lambda functions, the MCP server, Claude AI, and how they connect. Use this when the user asks how the site works or how it was built.",
+        "Renders an interactive architecture diagram explaining how ask.archil.io works end-to-end: the React SSR frontend, two AWS Lambda functions (web app + LLM streaming), Claude Haiku 4.5 via the Anthropic API, the MCP server that extends Claude with tools and interactive apps, guest JWT authentication, and the full request lifecycle from browser to AI and back. Use this whenever the visitor asks how the site is built, what technologies it uses, or how the AI integration works.",
       inputSchema: {},
       _meta: { ui: { resourceUri } },
     },
