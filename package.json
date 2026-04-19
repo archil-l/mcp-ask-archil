@@ -9,13 +9,15 @@
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && npm run build:apps && node esbuild.config.mjs && tsc -p cdk/tsconfig.json && npx cdk synth",
     "build:cdk": "tsc -p cdk/tsconfig.json",
-    "build:apps": "npm run build:app:get-resume",
+    "build:apps": "npm run build:app:get-resume && npm run build:app:get-architecture",
     "build:app:get-resume": "cd src/apps/get-resume && cross-env INPUT=get-resume-app.html vite build",
+    "build:app:get-architecture": "cd src/apps/get-architecture && cross-env INPUT=get-architecture-app.html vite build",
     "watch:app:get-resume": "cd src/apps/get-resume && cross-env INPUT=get-resume-app.html vite build --watch",
+    "watch:app:get-architecture": "cd src/apps/get-architecture && cross-env INPUT=get-architecture-app.html vite build --watch",
     "mcp": "npm-run-all --parallel mcp:proxy mcp:inspector",
     "mcp:proxy": "AWS_PROFILE=agent node --env-file=.env --import=tsx scripts/mcp-proxy.ts",
     "mcp:inspector": "DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector",
-    "dev": "cross-env NODE_ENV=development concurrently \"npm run watch:app:get-resume\" \"npm run mcp:proxy\"",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run watch:app:get-resume\" \"npm run watch:app:get-architecture\" \"npm run mcp:proxy\"",
     "deploy": "npx cdk deploy mcp-server-archil-io-prod --profile agent"
   },
   "dependencies": {
