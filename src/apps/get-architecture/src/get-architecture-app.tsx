@@ -39,69 +39,127 @@ const C = {
   orange: "#f59e0b",
 };
 
-// ── Section 1: System Overview ────────────────────────────────────────────────
+// ── AWS-style SVG icons ───────────────────────────────────────────────────────
 
-function SystemNode({
-  x, y, width = 160, height = 80, label, sublabel, color, delay = 0,
-}: {
-  x: number; y: number; width?: number; height?: number;
-  label: string; sublabel: string; color: string; delay?: number;
-}) {
+// Lambda icon (AWS orange λ shape)
+function IconLambda({ x, y, size = 32 }: { x: number; y: number; size?: number }) {
+  const s = size / 32;
   return (
-    <g className="fade-in" style={{ animationDelay: `${delay}ms` }}>
-      <rect
-        x={x} y={y} width={width} height={height} rx={10}
-        fill={C.bgMuted} stroke={color} strokeWidth={2}
-      />
-      <rect x={x} y={y} width={width} height={28} rx={10} fill={color} />
-      <rect x={x} y={y + 18} width={width} height={10} fill={color} />
-      <text x={x + width / 2} y={y + 18} textAnchor="middle" fill={C.primaryFg}
-        fontSize={12} fontWeight="600">
-        {label}
-      </text>
-      <text x={x + width / 2} y={y + 48} textAnchor="middle" fill={C.fgMuted}
-        fontSize={10} dominantBaseline="middle">
-        {sublabel}
-      </text>
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={32} height={32} rx={6} fill="#E8741A" />
+      <text x={16} y={23} textAnchor="middle" fill="white" fontSize={18} fontWeight="700" fontFamily="monospace">λ</text>
     </g>
   );
 }
 
-function AnimatedArrow({
-  x1, y1, x2, y2, label, delay = 0, bidirectional = false,
+// CloudFront icon (globe-like)
+function IconCloudFront({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
+  const s = size / 28;
+  return (
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={28} height={28} rx={6} fill="#8C4FFF" />
+      <ellipse cx={14} cy={14} rx={9} ry={9} fill="none" stroke="white" strokeWidth={1.5} />
+      <ellipse cx={14} cy={14} rx={4} ry={9} fill="none" stroke="white" strokeWidth={1} />
+      <line x1={5} y1={14} x2={23} y2={14} stroke="white" strokeWidth={1} />
+    </g>
+  );
+}
+
+// S3 icon (bucket shape)
+function IconS3({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
+  const s = size / 28;
+  return (
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={28} height={28} rx={6} fill="#3F8624" />
+      <ellipse cx={14} cy={10} rx={8} ry={3.5} fill="white" opacity={0.9} />
+      <rect x={6} y={10} width={16} height={9} fill="white" opacity={0.7} />
+      <ellipse cx={14} cy={19} rx={8} ry={3.5} fill="white" opacity={0.9} />
+    </g>
+  );
+}
+
+// Anthropic/Claude icon (A shape)
+function IconClaude({ x, y, size = 32 }: { x: number; y: number; size?: number }) {
+  const s = size / 32;
+  return (
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={32} height={32} rx={6} fill="#CC785C" />
+      <text x={16} y={23} textAnchor="middle" fill="white" fontSize={16} fontWeight="700">A</text>
+    </g>
+  );
+}
+
+// API Gateway icon
+function IconAPIGW({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
+  const s = size / 28;
+  return (
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={28} height={28} rx={6} fill="#E8741A" />
+      <line x1={5} y1={9}  x2={23} y2={9}  stroke="white" strokeWidth={2} strokeLinecap="round" />
+      <line x1={5} y1={14} x2={23} y2={14} stroke="white" strokeWidth={2} strokeLinecap="round" />
+      <line x1={5} y1={19} x2={23} y2={19} stroke="white" strokeWidth={2} strokeLinecap="round" />
+    </g>
+  );
+}
+
+// Browser icon
+function IconBrowser({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
+  const s = size / 28;
+  return (
+    <g transform={`translate(${x - size / 2}, ${y - size / 2}) scale(${s})`}>
+      <rect width={28} height={28} rx={6} fill={C.primary} />
+      <rect x={3} y={3} width={22} height={22} rx={3} fill="none" stroke="white" strokeWidth={1.5} />
+      <line x1={3} y1={9} x2={25} y2={9} stroke="white" strokeWidth={1.5} />
+      <circle cx={7} cy={6} r={1.2} fill="white" />
+      <circle cx={11} cy={6} r={1.2} fill="white" />
+    </g>
+  );
+}
+
+// ── Section 1: AWS Infrastructure Overview ────────────────────────────────────
+
+// Reusable connection arrow matching the style in DataFlowSection / McpAppsSection
+function InfraArrow({
+  x1, y1, x2, y2, label, delay = 0, id,
 }: {
   x1: number; y1: number; x2: number; y2: number;
-  label?: string; delay?: number; bidirectional?: boolean;
+  label?: string; delay?: number; id: string;
 }) {
-  const len = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  // Shrink both ends by 8px so arrow doesn't overlap the node
+  const ux = dx / len;
+  const uy = dy / len;
+  const sx = x1 + ux * 8;
+  const sy = y1 + uy * 8;
+  const ex = x2 - ux * 8;
+  const ey = y2 - uy * 8;
+  const drawLen = len - 16;
+  const mx = (sx + ex) / 2;
+  const my = (sy + ey) / 2;
   return (
     <g className="fade-in" style={{ animationDelay: `${delay}ms` }}>
       <defs>
-        <marker id={`arr-${delay}`} markerWidth="8" markerHeight="8"
-          refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill={C.primary} />
+        <marker id={id} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L0,7 L7,3.5 z" fill={C.primary} />
         </marker>
-        {bidirectional && (
-          <marker id={`arr-back-${delay}`} markerWidth="8" markerHeight="8"
-            refX="2" refY="3" orient="auto-start-reverse">
-            <path d="M0,3 L8,0 L8,6 z" fill={C.primary} />
-          </marker>
-        )}
+        <marker id={`${id}-back`} markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto-start-reverse">
+          <path d="M0,0 L0,7 L7,3.5 z" fill={C.primary} />
+        </marker>
       </defs>
       <line
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        stroke={C.primary} strokeWidth={2}
-        markerEnd={`url(#arr-${delay})`}
-        markerStart={bidirectional ? `url(#arr-back-${delay})` : undefined}
+        x1={sx} y1={sy} x2={ex} y2={ey}
+        stroke={C.primary} strokeWidth={1.5}
+        markerEnd={`url(#${id})`}
+        markerStart={`url(#${id}-back)`}
         className="draw-line"
-        style={{ "--len": `${len}` } as React.CSSProperties}
-        strokeDasharray={len}
-        strokeDashoffset={len}
+        style={{ "--len": `${drawLen}` } as React.CSSProperties}
+        strokeDasharray={drawLen}
+        strokeDashoffset={drawLen}
       />
       {label && (
-        <text x={mx} y={my - 6} textAnchor="middle" fill={C.fgMuted} fontSize={9}>
+        <text x={mx} y={my - 6} textAnchor="middle" fill={C.fgMuted} fontSize={8.5}>
           {label}
         </text>
       )}
@@ -109,38 +167,127 @@ function AnimatedArrow({
   );
 }
 
+// AWS-style grouped service box
+function AwsGroup({
+  x, y, width, height, label, color, delay = 0, children,
+}: {
+  x: number; y: number; width: number; height: number;
+  label: string; color: string; delay?: number;
+  children?: React.ReactNode;
+}) {
+  return (
+    <g className="fade-in" style={{ animationDelay: `${delay}ms` }}>
+      <rect x={x} y={y} width={width} height={height} rx={8}
+        fill={C.bgMuted} stroke={color} strokeWidth={1.5} strokeDasharray="5 3" />
+      <rect x={x + 8} y={y - 9} width={width - 16} height={16} rx={4} fill={C.bg} />
+      <text x={x + width / 2} y={y - 1} textAnchor="middle" dominantBaseline="middle"
+        fontSize={9} fontWeight="700" fill={color}>
+        {label}
+      </text>
+      {children}
+    </g>
+  );
+}
+
+// Single service tile inside a group
+function ServiceTile({
+  x, y, label, Icon,
+}: {
+  x: number; y: number; label: string;
+  Icon: React.ComponentType<{ x: number; y: number; size?: number }>;
+}) {
+  return (
+    <g>
+      <Icon x={x} y={y} size={28} />
+      <text x={x} y={y + 20} textAnchor="middle" fill={C.fgMuted} fontSize={8}>
+        {label}
+      </text>
+    </g>
+  );
+}
+
 function OverviewSection() {
+  // Layout constants
+  const W = 580;
+  const H = 210;
+
+  // Group bounds
+  const homepageX = 12;  const homepageW = 180;
+  const claudeX   = 220; const claudeW   = 140;
+  const mcpX      = 390; const mcpW      = 180;
+  const groupY    = 24;  const groupH    = 150;
+
+  // Arrow y-midpoints for the groups
+  const arrowY = groupY + groupH / 2 + 10;
+
   return (
     <section>
       <h2 className="text-base font-semibold mb-3" style={{ color: C.fg }}>
-        System Overview
+        AWS Infrastructure
       </h2>
       <div className="rounded-xl border p-4" style={{ borderColor: C.border, background: C.bg }}>
-        <svg viewBox="0 0 580 120" width="100%" aria-label="System overview diagram">
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" aria-label="AWS infrastructure diagram">
           <style>{ANIMATION_CSS}</style>
+          <defs>
+            {/* AWS orange gradient for region border */}
+            <linearGradient id="aws-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#E8741A" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#E8741A" stopOpacity={0.1} />
+            </linearGradient>
+          </defs>
 
-          <SystemNode x={10}  y={20} label="ask.archil.io" sublabel={"Web Lambda (SSR)\nStream Lambda"} color={C.primary} delay={0} />
-          <SystemNode x={210} y={20} label="Claude AI" sublabel={"Haiku 4.5\nAnthropic API"} color={C.accent} delay={200} />
-          <SystemNode x={410} y={20} label="mcp-ask-archil" sublabel={"Lambda (Node 24)\nTools + MCP Apps"} color={C.green} delay={400} />
+          {/* AWS Region background */}
+          <rect x={2} y={14} width={W - 4} height={H - 20} rx={10}
+            fill="url(#aws-grad)" stroke="#E8741A" strokeWidth={1} strokeDasharray="6 3"
+            className="fade-in" style={{ animationDelay: "0ms" }} />
+          <text x={12} y={12} fontSize={8} fill="#E8741A" fontWeight="600"
+            className="fade-in" style={{ animationDelay: "0ms" }}>
+            AWS us-east-1
+          </text>
 
-          {/* ask.archil.io ↔ Claude */}
-          <AnimatedArrow x1={170} y1={60} x2={210} y2={60} bidirectional delay={600} label="stream + tools" />
+          {/* ── ask.archil.io group ── */}
+          <AwsGroup x={homepageX} y={groupY} width={homepageW} height={groupH}
+            label="ask.archil.io" color={C.primary} delay={100}>
+            {/* CloudFront */}
+            <ServiceTile x={homepageX + 30} y={groupY + 44} label="CloudFront" Icon={IconCloudFront} />
+            {/* Web Lambda */}
+            <ServiceTile x={homepageX + 78} y={groupY + 44} label="Web Lambda" Icon={IconLambda} />
+            {/* Stream Lambda */}
+            <ServiceTile x={homepageX + 126} y={groupY + 44} label="Stream λ" Icon={IconLambda} />
+            {/* Browser above group */}
+            <ServiceTile x={homepageX + 78} y={groupY + 108} label="S3 Assets" Icon={IconS3} />
+          </AwsGroup>
+
+          {/* ── Claude AI / Anthropic ── */}
+          <AwsGroup x={claudeX} y={groupY} width={claudeW} height={groupH}
+            label="Anthropic API" color={C.accent} delay={250}>
+            <ServiceTile x={claudeX + claudeW / 2} y={groupY + 68} label="Claude Haiku 4.5" Icon={IconClaude} />
+          </AwsGroup>
+
+          {/* ── mcp-ask-archil group ── */}
+          <AwsGroup x={mcpX} y={groupY} width={mcpW} height={groupH}
+            label="mcp-ask-archil" color={C.green} delay={400}>
+            <ServiceTile x={mcpX + 36}  y={groupY + 44} label="API Gateway" Icon={IconAPIGW} />
+            <ServiceTile x={mcpX + 90}  y={groupY + 44} label="MCP Lambda" Icon={IconLambda} />
+            <ServiceTile x={mcpX + 144} y={groupY + 44} label="S3 (PDF)" Icon={IconS3} />
+          </AwsGroup>
+
+          {/* ── Arrows ── */}
+          {/* Stream Lambda ↔ Claude */}
+          <InfraArrow
+            x1={homepageX + homepageW} y1={arrowY}
+            x2={claudeX}              y2={arrowY}
+            label="SSE stream / tool calls"
+            delay={650} id="ov-arr-0"
+          />
           {/* Claude ↔ MCP server */}
-          <AnimatedArrow x1={370} y1={60} x2={410} y2={60} bidirectional delay={900} label="MCP protocol" />
+          <InfraArrow
+            x1={claudeX + claudeW} y1={arrowY}
+            x2={mcpX}              y2={arrowY}
+            label="MCP protocol"
+            delay={900} id="ov-arr-1"
+          />
         </svg>
-
-        <div className="flex gap-6 mt-2 flex-wrap">
-          {[
-            { color: C.primary, label: "Homepage (ask.archil.io)" },
-            { color: C.accent,  label: "Claude AI (Anthropic)" },
-            { color: C.green,   label: "MCP Server (this server)" },
-          ].map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: C.fgMuted }}>
-              <span className="inline-block w-3 h-3 rounded-sm" style={{ background: color }} />
-              {label}
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
