@@ -3,6 +3,7 @@ import { getAlertsTool } from "./tools/get-alerts.js";
 import { getForecastTool } from "./tools/get-forecast.js";
 import { addNumbersTool } from "./tools/add-numbers.js";
 import { registerGetResumeApp } from "./apps/get-resume/get-resume-app.js";
+import { registerGetArchitectureApp } from "./apps/get-architecture/get-architecture-app.js";
 
 export function createMCPServer() {
   // Create server instance
@@ -17,6 +18,7 @@ export function createMCPServer() {
 
   // Register MCP Apps (tools + resources with UI)
   registerGetResumeApp(server);
+  registerGetArchitectureApp(server);
 
   return server;
 }

@@ -9,6 +9,9 @@
       "Bash(node --input-type=module)",
       "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/achiko/Projects/personal/mcp-ask-archil/node_modules/pdfjs-dist/package.json'\\)\\); print\\(json.dumps\\(d.get\\('exports', d.get\\('main', 'none'\\)\\), indent=2\\)\\)\")",
       "Bash(npm info *)"
+    ],
+    "additionalDirectories": [
+      "/Users/achiko/Projects/personal/ask-archil-io"
     ]
   }
 }
