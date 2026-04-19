@@ -18,6 +18,8 @@
     "mcp:proxy": "AWS_PROFILE=agent node --env-file=.env --import=tsx scripts/mcp-proxy.ts",
     "mcp:inspector": "DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run watch:app:get-resume\" \"npm run watch:app:get-architecture\" \"npm run mcp:proxy\"",
+    "dev:app:get-resume": "cross-env APP=get-resume vite --config vite.dev.config.ts",
+    "dev:app:get-architecture": "cross-env APP=get-architecture vite --config vite.dev.config.ts",
     "deploy": "npx cdk deploy mcp-server-archil-io-prod --profile agent"
   },
   "dependencies": {
