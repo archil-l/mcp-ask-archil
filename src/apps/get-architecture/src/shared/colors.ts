@@ -2,6 +2,7 @@ export const C = {
   fg: "var(--mcp-ui-foreground, #1a1a1a)",
   fgMuted: "var(--mcp-ui-muted-foreground, #6b7280)",
   bg: "var(--mcp-ui-background, #ffffff)",
+  bgCanvas: "var(--mcp-ui-muted, #f0f2f5)",
   bgMuted: "var(--mcp-ui-muted, #f3f4f6)",
   border: "var(--mcp-ui-border, #e5e7eb)",
   primary: "var(--mcp-ui-primary, #3b82f6)",
