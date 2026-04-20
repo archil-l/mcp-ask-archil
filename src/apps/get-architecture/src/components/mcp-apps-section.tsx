@@ -50,8 +50,9 @@ function BrowserNode({ data }: { data: BrowserNodeData }) {
       <span style={{ fontSize: 11, fontWeight: 600, color: C.fg, textAlign: "center" }}>
         {data.label}
       </span>
-      <Handle id="right"  type="source" position={Position.Right}  style={sideHandle} />
-      <Handle id="bottom" type="source" position={Position.Bottom} style={hs} />
+      <Handle id="right"     type="source" position={Position.Right}  style={{ ...sideHandle, marginTop: -4 }} />
+      <Handle id="right-tgt" type="target" position={Position.Right}  style={{ ...sideHandle, marginTop:  4 }} />
+      <Handle id="bottom"    type="source" position={Position.Bottom} style={hs} />
     </div>
   );
 }
@@ -116,8 +117,9 @@ function ServiceIcon({ icon }: { icon: ServiceNodeData["icon"] }) {
 function ServiceNode({ data }: { data: ServiceNodeData }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <Handle id="top"    type="target" position={Position.Top}    style={hs} />
-      <Handle id="left"   type="target" position={Position.Left}   style={sideHandle} />
+      <Handle id="top"        type="target" position={Position.Top}    style={hs} />
+      <Handle id="left"       type="target" position={Position.Left}   style={{ ...sideHandle, marginTop: -4 }} />
+      <Handle id="left-src"   type="source" position={Position.Left}   style={{ ...sideHandle, marginTop:  4 }} />
       <ServiceIcon icon={data.icon} />
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: C.fg, textAlign: "center", maxWidth: 100 }}>
@@ -129,8 +131,9 @@ function ServiceNode({ data }: { data: ServiceNodeData }) {
           </span>
         )}
       </div>
-      <Handle id="right"  type="source" position={Position.Right}  style={sideHandle} />
-      <Handle id="bottom" type="source" position={Position.Bottom} style={hs} />
+      <Handle id="right"      type="source" position={Position.Right}  style={{ ...sideHandle, marginTop: -4 }} />
+      <Handle id="right-tgt"  type="target" position={Position.Right}  style={{ ...sideHandle, marginTop:  4 }} />
+      <Handle id="bottom"     type="source" position={Position.Bottom} style={hs} />
     </div>
   );
 }
@@ -205,12 +208,12 @@ const INITIAL_EDGES: Edge[] = [
     style: { stroke: "#3b82f6" },
     ...edgeBase,
   },
-  // Browser → MCP Proxy Lambda
+  // MCP Proxy Lambda → Browser (response: HTML bundle flows back)
   {
     id: "e-browser-mcp-proxy",
-    source: "browser", sourceHandle: "right",
-    target: "mcp-proxy", targetHandle: "left",
-    label: "fetch ui://",
+    source: "mcp-proxy", sourceHandle: "left-src",
+    target: "browser", targetHandle: "right-tgt",
+    label: "HTML bundle",
     animated: true,
     style: { stroke: "#3b82f6" },
     ...edgeBase,
@@ -235,11 +238,11 @@ const INITIAL_EDGES: Edge[] = [
     style: { stroke: "#22c55e" },
     ...edgeBase,
   },
-  // MCP Proxy → MCP Server
+  // MCP Server → MCP Proxy (response: resource content flows back)
   {
     id: "e-proxy-mcp",
-    source: "mcp-proxy", sourceHandle: "right",
-    target: "mcp-server", targetHandle: "left",
+    source: "mcp-server", sourceHandle: "left-src",
+    target: "mcp-proxy", targetHandle: "right-tgt",
     label: "resources/read",
     animated: true,
     style: { stroke: "#22c55e" },

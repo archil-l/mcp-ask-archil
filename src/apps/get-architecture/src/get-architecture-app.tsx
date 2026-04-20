@@ -54,9 +54,9 @@ function ArchitectureViewerInner({ app }: { app: App }) {
 
       <TechStack />
       <OverviewSection />
+      <McpAppsSection />
       <DataFlowSection />
       <GuestAuthSection />
-      <McpAppsSection />
     </main>
   );
 }
