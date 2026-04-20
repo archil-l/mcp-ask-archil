@@ -5,11 +5,11 @@ import { createRoot } from "react-dom/client";
 import "@/styles/globals.css";
 
 import { C, ANIMATION_CSS } from "./shared/colors";
-import { OverviewSection } from "./components/OverviewSection";
-import { DataFlowSection } from "./components/DataFlowSection";
-import { GuestAuthSection } from "./components/GuestAuthSection";
-import { McpAppsSection } from "./components/McpAppsSection";
-import { TechStack } from "./components/TechStack";
+import { OverviewSection } from "./components/overview-section";
+import { DataFlowSection } from "./components/data-flow-section";
+import { GuestAuthSection } from "./components/guest-auth-section";
+import { McpAppsSection } from "./components/mcp-apps-section";
+import { TechStack } from "./components/tech-stack";
 
 function ArchitectureViewerInner({ app }: { app: App }) {
   useHostStyles(app, app.getHostContext());

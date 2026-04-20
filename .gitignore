@@ -3,3 +3,4 @@ node_modules/
 dist/
 .env
 src/apps/get-resume/fixtures/*.pdf
+.DS_Store
