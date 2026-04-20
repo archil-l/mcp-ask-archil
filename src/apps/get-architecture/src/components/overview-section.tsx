@@ -23,6 +23,8 @@ import lambdaSvg from "../resources/architecture-service-icons/Arch_Compute/64/A
 import cloudfrontSvg from "../resources/architecture-service-icons/Arch_Networking-Content-Delivery/64/Arch_Amazon-CloudFront_64.svg";
 import s3Svg from "../resources/architecture-service-icons/Arch_Storage/64/Arch_Amazon-Simple-Storage-Service_64.svg";
 import apiGwSvg from "../resources/architecture-service-icons/Arch_Networking-Content-Delivery/64/Arch_Amazon-API-Gateway_64.svg";
+import claudeSvg from "../resources/claude-logo.svg";
+import mcpSvg from "../resources/mcp.svg";
 
 // ── Custom node ───────────────────────────────────────────────────────────────
 
@@ -50,25 +52,26 @@ function BrowserIcon() {
   );
 }
 
-function ClaudeIcon() {
-  return (
-    <svg viewBox="0 0 72 72" width={ICON_SIZE} height={ICON_SIZE} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="72" height="72" rx="14" fill="#CC785C20" />
-      <text x="36" y="46" textAnchor="middle" fontSize="28" fill="#CC785C">✦</text>
-    </svg>
-  );
-}
-
 function ServiceNode({ data }: { data: ServiceNodeData }) {
+  let icon: React.ReactNode;
+  if (data.icon === "browser") {
+    icon = <BrowserIcon />;
+  } else if (data.icon === "claude") {
+    icon = <img src={claudeSvg} alt="" width={ICON_SIZE} height={ICON_SIZE} style={{ display: "block" }} />;
+  } else if (data.icon === "mcp") {
+    icon = (
+      <div style={{ width: ICON_SIZE, height: ICON_SIZE, borderRadius: 10, background: "#00000010", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <img src={mcpSvg} alt="" width={ICON_SIZE * 0.6} height={ICON_SIZE * 0.6} style={{ display: "block" }} />
+      </div>
+    );
+  } else {
+    icon = <img src={data.icon as string} alt="" width={ICON_SIZE} height={ICON_SIZE} style={{ display: "block" }} />;
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, background: "transparent" }}>
       <Handle id="top"    type="target" position={Position.Top}    style={handleStyle} />
       <Handle id="left"   type="target" position={Position.Left}   style={sideHandleStyle} />
-      {data.icon === "browser"
-        ? <BrowserIcon />
-        : data.icon === "claude"
-        ? <ClaudeIcon />
-        : <img src={data.icon as string} alt="" width={ICON_SIZE} height={ICON_SIZE} style={{ display: "block" }} />}
+      {icon}
       <span style={{ fontSize: 12, fontWeight: 600, color: C.fg, lineHeight: 1.2, textAlign: "center", maxWidth: ICON_SIZE }}>
         {data.label}
       </span>
@@ -125,7 +128,7 @@ const INITIAL_NODES: Node[] = [
   // ── Groups (must come before children) ───────────────────────────────────────
   {
     id: "g-homepage", type: "group", position: { x: 130, y: 20 },
-    style: { width: 503, height: 367 },
+    style: { width: 503, height: 490 },
     data: { label: "ask.archil.io", color: "#3b82f6" } as GroupNodeData,
   },
   {
@@ -135,14 +138,15 @@ const INITIAL_NODES: Node[] = [
   },
 
   // ── Standalone ────────────────────────────────────────────────────────────────
-  { id: "browser", type: "service", position: { x: 0, y: 160 }, data: { label: "Browser", icon: "browser" } as ServiceNodeData },
+  { id: "browser", type: "service", position: { x: 0, y: 200 }, data: { label: "Browser", icon: "browser" } as ServiceNodeData },
 
   // ── Group 1: ask.archil.io ────────────────────────────────────────────────────
-  { id: "cloudfront",    type: "service", position: { x: 20,  y: 140 }, parentId: "g-homepage", extent: "parent", data: { label: "CloudFront",       icon: cloudfrontSvg } as ServiceNodeData },
-  { id: "web-lambda",    type: "service", position: { x: 210, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "Web Lambda",       icon: lambdaSvg     } as ServiceNodeData },
-  { id: "s3-assets",     type: "service", position: { x: 400, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "S3 Assets",        icon: s3Svg         } as ServiceNodeData },
-  { id: "stream-lambda", type: "service", position: { x: 210, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Stream Lambda",    icon: lambdaSvg     } as ServiceNodeData },
-  { id: "claude",        type: "service", position: { x: 400, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Claude Haiku 4.5", icon: "claude"      } as ServiceNodeData },
+  { id: "cloudfront",        type: "service", position: { x: 20,  y: 180 }, parentId: "g-homepage", extent: "parent", data: { label: "CloudFront",         icon: cloudfrontSvg } as ServiceNodeData },
+  { id: "web-lambda",        type: "service", position: { x: 210, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "Web Lambda",         icon: lambdaSvg     } as ServiceNodeData },
+  { id: "s3-assets",         type: "service", position: { x: 400, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "S3 Assets",          icon: s3Svg         } as ServiceNodeData },
+  { id: "stream-lambda",     type: "service", position: { x: 210, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Stream Lambda",      icon: lambdaSvg     } as ServiceNodeData },
+  { id: "mcp-proxy-lambda",  type: "service", position: { x: 210, y: 370 }, parentId: "g-homepage", extent: "parent", data: { label: "MCP Proxy Lambda",   icon: "mcp"         } as ServiceNodeData },
+  { id: "claude",            type: "service", position: { x: 405, y: 201 }, parentId: "g-homepage", extent: "parent", data: { label: "Claude Haiku 4.5",   icon: "claude"      } as ServiceNodeData },
 
   // ── Group 2: mcp apps / tools ─────────────────────────────────────────────────
   { id: "api-gw",     type: "service", position: { x: 26,  y: 27 }, parentId: "g-mcp", extent: "parent", data: { label: "API Gateway", icon: apiGwSvg  } as ServiceNodeData },
@@ -157,8 +161,10 @@ const INITIAL_EDGES: Edge[] = [
   { id: "e-web-s3",                              source: "web-lambda",    sourceHandle: "right",  target: "s3-assets",     targetHandle: "left",  label: "static assets",    animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
   { id: "e-sl-claude",                           source: "stream-lambda", sourceHandle: "right",  target: "claude",        targetHandle: "left",  label: "SSE / tool calls", animated: true,  style: { stroke: "#8b5cf6" }, labelStyle: { fontSize: 10 } },
   { id: "e-claude-mcp",                          source: "claude",        sourceHandle: "right",  target: "api-gw",        targetHandle: "left",  label: "MCP protocol",     animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
-  { id: "e-apigw-mcp",                           source: "api-gw",        sourceHandle: "right",  target: "mcp-lambda",    targetHandle: "left",                             animated: true,  style: { stroke: "#6b7280", strokeDasharray: "5 4" } },
-  { id: "e-mcp-s3",                              source: "mcp-lambda",    sourceHandle: "right",  target: "s3-pdf",        targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
+  { id: "e-apigw-mcp",                           source: "api-gw",          sourceHandle: "right",  target: "mcp-lambda",       targetHandle: "left",                             animated: true,  style: { stroke: "#6b7280", strokeDasharray: "5 4" } },
+  { id: "e-mcp-s3",                              source: "mcp-lambda",      sourceHandle: "right",  target: "s3-pdf",           targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
+  { id: "e-cf-mcp-proxy",                        source: "cloudfront",      sourceHandle: "right",  target: "mcp-proxy-lambda", targetHandle: "left",  label: "fetch ui://",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-mcp-proxy-apigw",                     source: "mcp-proxy-lambda", sourceHandle: "right", target: "api-gw",           targetHandle: "left",  label: "resources/read",   animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
 ];
 
 // ── Section ───────────────────────────────────────────────────────────────────
@@ -227,7 +233,7 @@ export function OverviewSection() {
       <h2 className="text-base font-semibold mb-3" style={{ color: C.fg }}>
         Infrastructure Overview
       </h2>
-      <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border, height: 340 }}>
+      <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border, height: 440 }}>
         <ReactFlow
           className={showHandles ? "show-handles" : undefined}
           nodes={nodes}
