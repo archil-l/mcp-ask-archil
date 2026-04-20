@@ -69,7 +69,7 @@ function ServiceNode({ data }: { data: ServiceNodeData }) {
         : data.icon === "claude"
         ? <ClaudeIcon />
         : <img src={data.icon as string} alt="" width={ICON_SIZE} height={ICON_SIZE} style={{ display: "block" }} />}
-      <span style={{ fontSize: 11, fontWeight: 600, color: C.fg, lineHeight: 1.2, textAlign: "center", maxWidth: ICON_SIZE }}>
+      <span style={{ fontSize: 12, fontWeight: 600, color: C.fg, lineHeight: 1.2, textAlign: "center", maxWidth: ICON_SIZE }}>
         {data.label}
       </span>
       <Handle id="bottom" type="source" position={Position.Bottom} style={handleStyle} />
@@ -101,9 +101,9 @@ function GroupNode({ data, selected }: { data: GroupNodeData; selected?: boolean
       }}>
         <span style={{
           position: "absolute", top: -10, left: 14,
-          background: C.bg,
+          background: C.bgCanvas,
           padding: "0 6px",
-          fontSize: 10, fontWeight: 600, letterSpacing: "0.03em",
+          fontSize: 11, fontWeight: 600, letterSpacing: "0.03em",
           color: data.color,
           opacity: 0.8,
         }}>
@@ -151,14 +151,14 @@ const INITIAL_NODES: Node[] = [
 ];
 
 const INITIAL_EDGES: Edge[] = [
-  { id: "e-browser-cf",                          source: "browser",       sourceHandle: "right",  target: "cloudfront",    targetHandle: "left",  label: "HTTPS",            animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 9 } },
-  { id: "e-cf-web",                              source: "cloudfront",    sourceHandle: "right",  target: "web-lambda",    targetHandle: "left",  label: "HTTPS / SSR",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 9 } },
-  { id: "xy-edge__cloudfrontright-stream-lambdaleft", source: "cloudfront", sourceHandle: "right", target: "stream-lambda", targetHandle: "left",  label: "/stream",          animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 9 } },
-  { id: "e-web-s3",                              source: "web-lambda",    sourceHandle: "right",  target: "s3-assets",     targetHandle: "left",  label: "static assets",    animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 9 } },
-  { id: "e-sl-claude",                           source: "stream-lambda", sourceHandle: "right",  target: "claude",        targetHandle: "left",  label: "SSE / tool calls", animated: true,  style: { stroke: "#8b5cf6" }, labelStyle: { fontSize: 9 } },
-  { id: "e-claude-mcp",                          source: "claude",        sourceHandle: "right",  target: "api-gw",        targetHandle: "left",  label: "MCP protocol",     animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 9 } },
+  { id: "e-browser-cf",                          source: "browser",       sourceHandle: "right",  target: "cloudfront",    targetHandle: "left",  label: "HTTPS",            animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-cf-web",                              source: "cloudfront",    sourceHandle: "right",  target: "web-lambda",    targetHandle: "left",  label: "HTTPS / SSR",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "xy-edge__cloudfrontright-stream-lambdaleft", source: "cloudfront", sourceHandle: "right", target: "stream-lambda", targetHandle: "left",  label: "/stream",          animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-web-s3",                              source: "web-lambda",    sourceHandle: "right",  target: "s3-assets",     targetHandle: "left",  label: "static assets",    animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
+  { id: "e-sl-claude",                           source: "stream-lambda", sourceHandle: "right",  target: "claude",        targetHandle: "left",  label: "SSE / tool calls", animated: true,  style: { stroke: "#8b5cf6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-claude-mcp",                          source: "claude",        sourceHandle: "right",  target: "api-gw",        targetHandle: "left",  label: "MCP protocol",     animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
   { id: "e-apigw-mcp",                           source: "api-gw",        sourceHandle: "right",  target: "mcp-lambda",    targetHandle: "left",                             animated: true,  style: { stroke: "#6b7280", strokeDasharray: "5 4" } },
-  { id: "e-mcp-s3",                              source: "mcp-lambda",    sourceHandle: "right",  target: "s3-pdf",        targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 9 } },
+  { id: "e-mcp-s3",                              source: "mcp-lambda",    sourceHandle: "right",  target: "s3-pdf",        targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
 ];
 
 // ── Section ───────────────────────────────────────────────────────────────────
@@ -247,9 +247,9 @@ export function OverviewSection() {
           elementsSelectable={true}
           reconnectRadius={20}
           proOptions={{ hideAttribution: true }}
-          style={{ background: C.bg }}
+          style={{ background: C.bgCanvas }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color={C.border} />
+          <Background variant={BackgroundVariant.Lines} gap={24} lineWidth={0.5} color={C.border} />
           <Controls />
           <Panel position="top-right">
             <div style={{ display: "flex", gap: 6 }}>
