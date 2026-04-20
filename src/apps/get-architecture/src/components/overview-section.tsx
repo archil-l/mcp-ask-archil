@@ -225,7 +225,7 @@ export function OverviewSection() {
     <section>
       <style>{HANDLE_CSS}</style>
       <h2 className="text-base font-semibold mb-3" style={{ color: C.fg }}>
-        AWS Infrastructure
+        Infrastructure Overview
       </h2>
       <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border, height: 340 }}>
         <ReactFlow
