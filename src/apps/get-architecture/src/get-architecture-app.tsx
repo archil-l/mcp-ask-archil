@@ -11,6 +11,7 @@ import { GuestAuthSection } from "./components/guest-auth-section";
 import { McpAppsSection } from "./components/mcp-apps-section";
 import { TechStack } from "./components/tech-stack";
 
+
 function ArchitectureViewerInner({ app }: { app: App }) {
   useHostStyles(app, app.getHostContext());
 
@@ -18,23 +19,16 @@ function ArchitectureViewerInner({ app }: { app: App }) {
     <main className="w-full overflow-y-auto p-4 space-y-6" style={{ background: C.bg }}>
       <style>{ANIMATION_CSS}</style>
       <div className="fade-in space-y-3">
-        <h1 className="text-lg font-bold" style={{ color: C.fg }}>How ask.archil.io Is Built</h1>
+        <h1 className="text-lg font-bold" style={{ color: C.fg }}>Overview</h1>
         <p className="text-sm leading-relaxed" style={{ color: C.fgMuted }}>
-          ask.archil.io is Archil's personal website — a chat interface where visitors can ask
-          anything about his work, experience, or background. Instead of a static page, every
-          response comes from a real{" "}
-          <span style={{ color: C.accent, fontWeight: 600 }}>Claude Haiku 4.5</span> instance that
-          streams answers in real time and uses tools to do things dynamically: display his resume,
-          toggle the page theme, or render interactive diagrams like this one.
+          Archil's AI driven personal website - ask.archil.io uses a chat interface where visitors can ask anything about his work, experience, or background. Instead of a static page, every response comes from a real Claude Haiku 4.5 instance that streams answers in real time and uses tools to do things dynamically: display his resume, toggle the page theme, or render
+          interactive diagrams like this one.
         </p>
         <p className="text-sm leading-relaxed" style={{ color: C.fgMuted }}>
-          Under the hood, two serverless{" "}
-          <span style={{ color: C.orange, fontWeight: 600 }}>AWS Lambda</span> functions power the
-          site — one for SSR and APIs, one dedicated to LLM streaming. A separate{" "}
-          <span style={{ color: C.green, fontWeight: 600 }}>MCP server</span> (also a Lambda) gives
-          Claude its extended capabilities via the Model Context Protocol. Guests get a short-lived{" "}
-          <span style={{ color: C.primary, fontWeight: 600 }}>JWT</span> automatically on page load
-          so the stream endpoint stays protected without any login.
+          Under the hood, two serverless AWS Lambda functions power the site — one for SSR and APIs,
+          one dedicated to LLM streaming. A separate MCP server (also a Lambda) gives Claude its
+          extended capabilities via the Model Context Protocol. Guests get a short-lived JWT
+          automatically on page load so the stream endpoint stays protected without any login.
         </p>
         <div className="flex gap-3 pt-1">
           {[
@@ -58,11 +52,11 @@ function ArchitectureViewerInner({ app }: { app: App }) {
         </div>
       </div>
 
+      <TechStack />
       <OverviewSection />
       <DataFlowSection />
       <GuestAuthSection />
       <McpAppsSection />
-      <TechStack />
     </main>
   );
 }
