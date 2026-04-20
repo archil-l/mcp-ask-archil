@@ -4,6 +4,7 @@ import {
   BackgroundVariant,
   Controls,
   Handle,
+  NodeResizer,
   Panel,
   Position,
   reconnectEdge,
@@ -77,22 +78,76 @@ function ServiceNode({ data }: { data: ServiceNodeData }) {
   );
 }
 
+// ── Group node ────────────────────────────────────────────────────────────────
+
+type GroupNodeData = { label: string; color: string };
+
+function GroupNode({ data, selected }: { data: GroupNodeData; selected?: boolean }) {
+  return (
+    <>
+      <NodeResizer
+        color={data.color}
+        isVisible={selected}
+        minWidth={200}
+        minHeight={100}
+        lineStyle={{ strokeDasharray: "4 3" }}
+      />
+      <div style={{
+        width: "100%", height: "100%",
+        border: `1px dashed ${data.color}`,
+        borderRadius: 14,
+        background: `${data.color}08`,
+        position: "relative",
+      }}>
+        <span style={{
+          position: "absolute", top: -10, left: 14,
+          background: C.bg,
+          padding: "0 6px",
+          fontSize: 10, fontWeight: 600, letterSpacing: "0.03em",
+          color: data.color,
+          opacity: 0.8,
+        }}>
+          {data.label}
+        </span>
+      </div>
+    </>
+  );
+}
+
 const nodeTypes: NodeTypes = {
   service: ServiceNode as unknown as NodeTypes[string],
+  group:   GroupNode  as unknown as NodeTypes[string],
 };
 
 // ── Initial layout ────────────────────────────────────────────────────────────
 
 const INITIAL_NODES: Node[] = [
-  { id: "browser",       type: "service", position: { x: 20,   y: 160 }, data: { label: "Browser",         icon: "browser"     } as ServiceNodeData },
-  { id: "cloudfront",    type: "service", position: { x: 170,  y: 160 }, data: { label: "CloudFront",       icon: cloudfrontSvg } as ServiceNodeData },
-  { id: "web-lambda",    type: "service", position: { x: 340,  y: 60  }, data: { label: "Web Lambda",       icon: lambdaSvg     } as ServiceNodeData },
-  { id: "s3-assets",     type: "service", position: { x: 510,  y: 60  }, data: { label: "S3 Assets",        icon: s3Svg         } as ServiceNodeData },
-  { id: "stream-lambda", type: "service", position: { x: 340,  y: 260 }, data: { label: "Stream Lambda",    icon: lambdaSvg     } as ServiceNodeData },
-  { id: "claude",        type: "service", position: { x: 510,  y: 260 }, data: { label: "Claude Haiku 4.5", icon: "claude"      } as ServiceNodeData },
-  { id: "api-gw",        type: "service", position: { x: 680,  y: 260 }, data: { label: "API Gateway",      icon: apiGwSvg      } as ServiceNodeData },
-  { id: "mcp-lambda",    type: "service", position: { x: 850,  y: 260 }, data: { label: "MCP Lambda",       icon: lambdaSvg     } as ServiceNodeData },
-  { id: "s3-pdf",        type: "service", position: { x: 1020, y: 260 }, data: { label: "S3 (PDF)",         icon: s3Svg         } as ServiceNodeData },
+  // ── Groups (must come before children) ───────────────────────────────────────
+  {
+    id: "g-homepage", type: "group", position: { x: 130, y: 20 },
+    style: { width: 503, height: 367 },
+    data: { label: "ask.archil.io", color: "#3b82f6" } as GroupNodeData,
+  },
+  {
+    id: "g-mcp", type: "group", position: { x: 714, y: 243 },
+    style: { width: 504, height: 146 },
+    data: { label: "mcp apps / tools", color: "#22c55e" } as GroupNodeData,
+  },
+
+  // ── Standalone ────────────────────────────────────────────────────────────────
+  { id: "browser", type: "service", position: { x: 0, y: 160 }, data: { label: "Browser", icon: "browser" } as ServiceNodeData },
+
+  // ── Group 1: ask.archil.io ────────────────────────────────────────────────────
+  { id: "cloudfront",    type: "service", position: { x: 20,  y: 140 }, parentId: "g-homepage", extent: "parent", data: { label: "CloudFront",       icon: cloudfrontSvg } as ServiceNodeData },
+  { id: "web-lambda",    type: "service", position: { x: 210, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "Web Lambda",       icon: lambdaSvg     } as ServiceNodeData },
+  { id: "s3-assets",     type: "service", position: { x: 400, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "S3 Assets",        icon: s3Svg         } as ServiceNodeData },
+  { id: "stream-lambda", type: "service", position: { x: 210, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Stream Lambda",    icon: lambdaSvg     } as ServiceNodeData },
+  { id: "claude",        type: "service", position: { x: 400, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Claude Haiku 4.5", icon: "claude"      } as ServiceNodeData },
+
+  // ── Group 2: mcp apps / tools ─────────────────────────────────────────────────
+  { id: "api-gw",     type: "service", position: { x: 26,  y: 27 }, parentId: "g-mcp", extent: "parent", data: { label: "API Gateway", icon: apiGwSvg  } as ServiceNodeData },
+  { id: "mcp-lambda", type: "service", position: { x: 206, y: 27 }, parentId: "g-mcp", extent: "parent", data: { label: "MCP Lambda",  icon: lambdaSvg } as ServiceNodeData },
+  { id: "s3-pdf",     type: "service", position: { x: 386, y: 27 }, parentId: "g-mcp", extent: "parent", data: { label: "S3 (PDF)",    icon: s3Svg     } as ServiceNodeData },
 ];
 
 const INITIAL_EDGES: Edge[] = [
@@ -110,6 +165,7 @@ const INITIAL_EDGES: Edge[] = [
 
 const HANDLE_CSS = `
   .show-handles .react-flow__handle { opacity: 1 !important; }
+  .react-flow__node-group { border: none !important; background: none !important; padding: 0 !important; }
 `;
 
 export function OverviewSection() {
@@ -137,9 +193,11 @@ export function OverviewSection() {
   }
 
   function copyLayout() {
-    const nodeLines = nodes
-      .map(n => `  { id: "${n.id}", x: ${Math.round(n.position.x)}, y: ${Math.round(n.position.y)} },`)
-      .join("\n");
+    const nodeLines = nodes.map(n => {
+      const base = `  { id: "${n.id}", x: ${Math.round(n.position.x)}, y: ${Math.round(n.position.y)}`;
+      const size = n.measured ? `, w: ${Math.round(n.measured.width ?? 0)}, h: ${Math.round(n.measured.height ?? 0)}` : "";
+      return base + (n.type === "group" ? size : "") + ` },`;
+    }).join("\n");
     const edgeLines = edgeState
       .map(e => `  { id: "${e.id}", source: "${e.source}", sourceHandle: "${e.sourceHandle}", target: "${e.target}", targetHandle: "${e.targetHandle}" },`)
       .join("\n");
