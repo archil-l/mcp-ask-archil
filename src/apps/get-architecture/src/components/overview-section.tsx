@@ -145,8 +145,8 @@ const INITIAL_NODES: Node[] = [
   { id: "web-lambda",        type: "service", position: { x: 210, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "Web Lambda",         icon: lambdaSvg     } as ServiceNodeData },
   { id: "s3-assets",         type: "service", position: { x: 400, y: 30  }, parentId: "g-homepage", extent: "parent", data: { label: "S3 Assets",          icon: s3Svg         } as ServiceNodeData },
   { id: "stream-lambda",     type: "service", position: { x: 210, y: 250 }, parentId: "g-homepage", extent: "parent", data: { label: "Stream Lambda",      icon: lambdaSvg     } as ServiceNodeData },
-  { id: "mcp-proxy-lambda",  type: "service", position: { x: 210, y: 370 }, parentId: "g-homepage", extent: "parent", data: { label: "MCP Proxy Lambda",   icon: "mcp"         } as ServiceNodeData },
-  { id: "claude",            type: "service", position: { x: 405, y: 201 }, parentId: "g-homepage", extent: "parent", data: { label: "Claude Haiku 4.5",   icon: "claude"      } as ServiceNodeData },
+  { id: "mcp-proxy-lambda",  type: "service", position: { x: 210, y: 370 }, parentId: "g-homepage", extent: "parent", data: { label: "MCP Proxy Lambda",   icon: lambdaSvg     } as ServiceNodeData },
+  { id: "claude",            type: "service", position: { x: 399, y: 136 }, parentId: "g-homepage", extent: "parent", data: { label: "Claude Haiku 4.5",   icon: "claude"      } as ServiceNodeData },
 
   // ── Group 2: mcp apps / tools ─────────────────────────────────────────────────
   { id: "api-gw",     type: "service", position: { x: 26,  y: 27 }, parentId: "g-mcp", extent: "parent", data: { label: "API Gateway", icon: apiGwSvg  } as ServiceNodeData },
@@ -155,16 +155,16 @@ const INITIAL_NODES: Node[] = [
 ];
 
 const INITIAL_EDGES: Edge[] = [
-  { id: "e-browser-cf",                          source: "browser",       sourceHandle: "right",  target: "cloudfront",    targetHandle: "left",  label: "HTTPS",            animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
-  { id: "e-cf-web",                              source: "cloudfront",    sourceHandle: "right",  target: "web-lambda",    targetHandle: "left",  label: "HTTPS / SSR",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
-  { id: "xy-edge__cloudfrontright-stream-lambdaleft", source: "cloudfront", sourceHandle: "right", target: "stream-lambda", targetHandle: "left",  label: "/stream",          animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
-  { id: "e-web-s3",                              source: "web-lambda",    sourceHandle: "right",  target: "s3-assets",     targetHandle: "left",  label: "static assets",    animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
-  { id: "e-sl-claude",                           source: "stream-lambda", sourceHandle: "right",  target: "claude",        targetHandle: "left",  label: "SSE / tool calls", animated: true,  style: { stroke: "#8b5cf6" }, labelStyle: { fontSize: 10 } },
-  { id: "e-claude-mcp",                          source: "claude",        sourceHandle: "right",  target: "api-gw",        targetHandle: "left",  label: "MCP protocol",     animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
-  { id: "e-apigw-mcp",                           source: "api-gw",          sourceHandle: "right",  target: "mcp-lambda",       targetHandle: "left",                             animated: true,  style: { stroke: "#6b7280", strokeDasharray: "5 4" } },
-  { id: "e-mcp-s3",                              source: "mcp-lambda",      sourceHandle: "right",  target: "s3-pdf",           targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
-  { id: "e-cf-mcp-proxy",                        source: "cloudfront",      sourceHandle: "right",  target: "mcp-proxy-lambda", targetHandle: "left",  label: "fetch ui://",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
-  { id: "e-mcp-proxy-apigw",                     source: "mcp-proxy-lambda", sourceHandle: "right", target: "api-gw",           targetHandle: "left",  label: "resources/read",   animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
+  { id: "e-browser-cf",                               source: "browser",          sourceHandle: "right",  target: "cloudfront",       targetHandle: "left",  label: "HTTPS",            animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-cf-web",                                   source: "cloudfront",       sourceHandle: "right",  target: "web-lambda",        targetHandle: "left",  label: "HTTPS / SSR",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "xy-edge__cloudfrontright-stream-lambdaleft", source: "cloudfront",       sourceHandle: "right",  target: "stream-lambda",     targetHandle: "left",  label: "/stream",          animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-web-s3",                                   source: "web-lambda",       sourceHandle: "right",  target: "s3-assets",         targetHandle: "left",  label: "static assets",    animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
+  { id: "e-sl-claude",                                source: "stream-lambda",    sourceHandle: "right",  target: "claude",            targetHandle: "left",  label: "SSE / tool calls", animated: true,  style: { stroke: "#8b5cf6" }, labelStyle: { fontSize: 10 } },
+  { id: "xy-edge__stream-lambdaright-api-gwleft",     source: "stream-lambda",    sourceHandle: "right",  target: "api-gw",            targetHandle: "left",  label: "MCP protocol",     animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
+  { id: "e-cf-mcp-proxy",                             source: "cloudfront",       sourceHandle: "right",  target: "mcp-proxy-lambda",  targetHandle: "left",  label: "fetch ui://",      animated: true,  style: { stroke: "#3b82f6" }, labelStyle: { fontSize: 10 } },
+  { id: "e-mcp-proxy-apigw",                          source: "mcp-proxy-lambda", sourceHandle: "right",  target: "api-gw",            targetHandle: "left",  label: "resources/read",   animated: true,  style: { stroke: "#22c55e" }, labelStyle: { fontSize: 10 } },
+  { id: "e-apigw-mcp",                                source: "api-gw",           sourceHandle: "right",  target: "mcp-lambda",        targetHandle: "left",                             animated: true,  style: { stroke: "#6b7280", strokeDasharray: "5 4" } },
+  { id: "e-mcp-s3",                                   source: "mcp-lambda",       sourceHandle: "right",  target: "s3-pdf",            targetHandle: "left",  label: "read PDF",         animated: false, style: { stroke: "#6b7280" }, labelStyle: { fontSize: 10 } },
 ];
 
 // ── Section ───────────────────────────────────────────────────────────────────
@@ -233,7 +233,7 @@ export function OverviewSection() {
       <h2 className="text-base font-semibold mb-3" style={{ color: C.fg }}>
         Infrastructure Overview
       </h2>
-      <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border, height: 440 }}>
+      <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border, height: 520 }}>
         <ReactFlow
           className={showHandles ? "show-handles" : undefined}
           nodes={nodes}
