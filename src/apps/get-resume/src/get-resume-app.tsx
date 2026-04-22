@@ -260,7 +260,7 @@ function ResumeViewerInner({
 
           {/* Floating action buttons */}
           <div className="absolute right-4 top-4 z-30 flex items-center gap-1 rounded-lg border bg-background/95 p-1 shadow-lg backdrop-blur-sm">
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
@@ -274,7 +274,7 @@ function ResumeViewerInner({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Refresh</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
 
             {pdfDataUrl && (
               <Tooltip>
