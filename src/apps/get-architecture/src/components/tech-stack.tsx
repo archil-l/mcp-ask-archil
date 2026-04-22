@@ -21,7 +21,7 @@ type TechItem = { label: string; icon: React.ReactNode };
 
 const TECH: TechItem[] = [
   { label: "React 19",       icon: img(reactSvg) },
-  { label: "React Router 7", icon: <img src={remixSvg} alt="" height={IMG_SIZE} style={{ display: "block", objectFit: "contain", width: "auto", maxWidth: 52 }} /> },
+  { label: "React Router 7", icon: <img src={remixSvg} alt="" height={IMG_SIZE} style={{ display: "block", objectFit: "contain", width: "auto", maxWidth: 52 }} />},
   { label: "Anthropic SDK",  icon: img(claudeSvg) },
   { label: "MCP SDK",        icon: img(mcpSvg) },
   { label: "AWS Lambda",     icon: img(lambdaSvg) },

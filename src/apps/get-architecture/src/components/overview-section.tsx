@@ -252,7 +252,6 @@ export function OverviewSection() {
           onConnect={() => {}}
           elementsSelectable={true}
           reconnectRadius={20}
-          proOptions={{ hideAttribution: true }}
           style={{ background: C.bgCanvas }}
         >
           <Background variant={BackgroundVariant.Lines} gap={24} lineWidth={0.5} color={C.border} />
