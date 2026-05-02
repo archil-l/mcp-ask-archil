@@ -21,15 +21,20 @@ const DIST_DIR = __filename.endsWith(".ts")
 
 const s3Client = new S3Client({});
 
+type ResumePdf = {
+  buffer: Buffer;
+  lastUpdated: string | null;
+};
+
 async function extractPdfText(buffer: Buffer): Promise<string> {
   const { text } = await extractText(new Uint8Array(buffer), { mergePages: true });
   return text as string;
 }
 
 /**
- * Fetches the resume PDF from S3 and returns it as base64
+ * Fetches the resume PDF from S3 and returns the buffer and last modified date
  */
-async function fetchResumePdf(): Promise<Buffer> {
+async function fetchResumePdf(): Promise<ResumePdf> {
   const bucketName =
     process.env.RESUME_BUCKET_NAME || "mcp-ask-archil-bucket-prod";
   const pdfKey = process.env.RESUME_PDF_KEY || "archil-l-resume.pdf";
@@ -46,7 +51,10 @@ async function fetchResumePdf(): Promise<Buffer> {
   }
 
   const bytes = await response.Body.transformToByteArray();
-  return Buffer.from(bytes);
+  return {
+    buffer: Buffer.from(bytes),
+    lastUpdated: response.LastModified?.toISOString() ?? null,
+  };
 }
 
 /**
@@ -68,7 +76,7 @@ export function registerGetResumeApp(server: McpServer): void {
     },
     async (): Promise<CallToolResult> => {
       try {
-        const pdfBuffer = await fetchResumePdf();
+        const { buffer: pdfBuffer, lastUpdated } = await fetchResumePdf();
         const pdfBase64 = pdfBuffer.toString("base64");
         const resumeText = await extractPdfText(pdfBuffer);
         return {
@@ -82,6 +90,7 @@ export function registerGetResumeApp(server: McpServer): void {
             pdfBase64,
             filename: "archil-l-resume.pdf",
             resumeText,
+            lastUpdated,
           },
         };
       } catch (error) {
