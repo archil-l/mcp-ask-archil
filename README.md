@@ -6,12 +6,10 @@ MCP server powering the tools and interactive apps on [ask.archil.io](https://as
 
 ## Available Tools
 
-| Tool               | Type      | Description                                                        |
-| ------------------ | --------- | ------------------------------------------------------------------ |
-| `get-alerts`       | Tool      | Weather alerts for a US state                                      |
-| `get-forecast`     | Tool      | Weather forecast for a location                                    |
-| `add-numbers`      | Tool      | Add two numbers (demo tool)                                        |
-| `get-resume`       | MCP App   | Interactive PDF resume viewer (fetches PDF from S3)                |
+| Tool               | Type      | Description                                                         |
+| ------------------ | --------- | ------------------------------------------------------------------- |
+| `add-numbers`      | Tool      | Add two numbers (demo tool)                                         |
+| `get-resume`       | MCP App   | Interactive PDF resume viewer (fetches PDF from S3)                 |
 | `get-architecture` | MCP App   | Animated architecture diagram explaining how ask.archil.io is built |
 
 ---
