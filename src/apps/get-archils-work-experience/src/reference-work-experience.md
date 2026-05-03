@@ -1,4 +1,16 @@
-work.en.md 
+<!--
+  reference-work-experience.md
+
+  This file is NOT used at runtime — nothing imports or reads it automatically.
+  It is a human-readable source of truth for the content rendered by the React
+  component at src/get-archils-work-experience-app.tsx.
+
+  When updating work experience copy, edit both this file and the TSX component
+  in sync so they stay consistent.
+
+  All text is written in third person about Archil.
+-->
+
 <SectionHeader sectionId="work">Work 👨🏻‍💻</SectionHeader>
 
 ![Sortation at Amazon Robotics](https://assets.aboutamazon.com/dims4/default/c90ddd3/2147483647/strip/true/crop/1600x900+0+0/resize/1320x743!/quality/90/?url=https%3A%2F%2Famazon-blogs-brightspot.s3.amazonaws.com%2Ff8%2F1b%2F29a9dcae4fe489b02d520132c0b6%2Fabout-amazon-inline-inline008-amazon-deliveringthefuture-robotics-amazon-mqy1-091124-ls-225-copy-6458x3632.jpg)
