@@ -165,11 +165,11 @@ function WorkExperienceInner({ app }: { app: App }) {
         </div>
 
         <p className="text-sm leading-relaxed" style={{ color: C.fgMuted }}>
-          I'm <strong style={{ color: C.fg }}>Frontend Engineer II</strong> on the 📦 Sortation Insights team at{" "}
+          Archil is a <strong style={{ color: C.fg }}>Frontend Engineer II</strong> on the 📦 Sortation Insights team at{" "}
           <ExternalLink href="https://www.aboutamazon.com/news/operations/amazon-robotics-robots-fulfillment-center">
             Amazon Robotics
           </ExternalLink>
-          . My work spans two main areas — dashboard tooling and agentic infrastructure for robotic fleet management.
+          . His work spans two main areas — dashboard tooling and agentic infrastructure for robotic fleet management.
         </p>
 
         <div className="space-y-2">
@@ -181,9 +181,9 @@ function WorkExperienceInner({ app }: { app: App }) {
               Agentic Systems
             </p>
             <p className="text-xs leading-relaxed" style={{ color: C.fgMuted }}>
-              Building proactive management systems using agents, MCP servers, knowledge bases, and memory.
+              Archil has been building proactive management systems using agents, MCP servers, knowledge bases, and memory.
               Alarm events trigger multistep workflows across fully automated and human-in-the-loop scenarios.
-              Shipped and iterated across AWS Bedrock, AgentCore, and Strands. Also built a full-stack agentic
+              He has shipped and iterated across AWS Bedrock, AgentCore, and Strands, and built a full-stack agentic
               web app with multi-party conversational UX using React Router v7 (Remix) and React 19.
             </p>
           </div>
@@ -195,8 +195,8 @@ function WorkExperienceInner({ app }: { app: App }) {
               Dashboard Tooling
             </p>
             <p className="text-xs leading-relaxed" style={{ color: C.fgMuted }}>
-              Rearchitected a web solution from 15+ seconds load time down to 2s. Introduced feature flags,
-              integration and e2e tests to move from bi-weekly releases to full CI/CD. Set up real-time
+              Archil rearchitected a web solution from 15+ seconds load time down to 2s. He introduced feature flags,
+              integration and e2e tests to move from bi-weekly releases to full CI/CD, and set up real-time
               CloudWatch dashboards to track load times and errors across all endpoints.
             </p>
           </div>
@@ -213,10 +213,10 @@ function WorkExperienceInner({ app }: { app: App }) {
             <ExternalLink href="https://www.quickbase.com">Quickbase</ExternalLink>
           </h2>
           <p className="text-xs mt-1 leading-relaxed" style={{ color: C.fgMuted }}>
-            Joined as a Software Engineering Co-op and advanced to Software Engineer II. Spent most of my time
+            Archil joined as a Software Engineering Co-op and advanced to Software Engineer II. He spent most of his time
             on a UI infrastructure team — building new features, reusable components, and contributing to
-            Quickbase's design system library. Also did significant work on web accessibility testing and
-            improvements, both within my own projects and in collaboration with other teams.
+            Quickbase's design system library. He also did significant work on web accessibility testing and
+            improvements, both within his own projects and in collaboration with other teams.
           </p>
         </div>
 
