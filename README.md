@@ -4,11 +4,12 @@ MCP server powering the tools and interactive apps on [ask.archil.io](https://as
 
 ## Available Tools
 
-| Tool               | Type      | Description                                                         |
-| ------------------ | --------- | ------------------------------------------------------------------- |
-| `add-numbers`      | Tool      | Add two numbers (demo tool)                                         |
-| `get-resume`       | MCP App   | Interactive PDF resume viewer (fetches PDF from S3)                 |
-| `get-architecture` | MCP App   | Animated architecture diagram explaining how ask.archil.io is built |
+| Tool                           | Type      | Description                                                                   |
+| ------------------------------ | --------- | ----------------------------------------------------------------------------- |
+| `add-numbers`                  | Tool      | Add two numbers (demo tool)                                                   |
+| `get-resume`                   | MCP App   | Interactive PDF resume viewer (fetches PDF from S3)                           |
+| `get-architecture`             | MCP App   | Animated architecture diagram explaining how ask.archil.io is built           |
+| `get-archils-work-experience`  | MCP App   | Interactive overview of Archil's professional work experience and projects    |
 
 ## MCP Apps
 
@@ -37,11 +38,16 @@ src/
 │   │   ├── vite.config.ts
 │   │   ├── get-resume-app.html
 │   │   └── src/get-resume-app.tsx
-│   └── get-architecture/
-│       ├── get-architecture-app.ts
+│   ├── get-architecture/
+│   │   ├── get-architecture-app.ts
+│   │   ├── vite.config.ts
+│   │   ├── get-architecture-app.html
+│   │   └── src/get-architecture-app.tsx
+│   └── get-archils-work-experience/
+│       ├── get-archils-work-experience-app.ts
 │       ├── vite.config.ts
-│       ├── get-architecture-app.html
-│       └── src/get-architecture-app.tsx
+│       ├── get-archils-work-experience-app.html
+│       └── src/get-archils-work-experience-app.tsx
 ├── types/types.ts              # defineTool factory
 ├── components/                 # Shared React components (pdf-viewer, ui/)
 ├── styles/globals.css          # Shared Tailwind styles
@@ -56,8 +62,9 @@ dist/mcp-lambda/                # Build output (bundled JS + HTML apps)
 ```bash
 npm run build                        # Full build: typecheck + apps + esbuild + CDK synth
 npm run build:apps                   # Build all MCP App HTML bundles
-npm run build:app:get-resume         # Build resume app only
-npm run build:app:get-architecture   # Build architecture app only
+npm run build:app:get-resume                   # Build resume app only
+npm run build:app:get-architecture             # Build architecture app only
+npm run build:app:get-archils-work-experience  # Build work experience app only
 npm run typecheck                    # TypeScript type check (no emit)
 npm run dev                          # Watch apps + start MCP proxy for local dev
 npm run deploy                       # Deploy to AWS (prod)

@@ -7,8 +7,9 @@ Guidance for Claude Code when working in this repository.
 ```bash
 npm run build                        # Full build: typecheck + apps + esbuild + CDK synth
 npm run build:apps                   # Build all MCP App HTML bundles
-npm run build:app:get-resume         # Build resume app only
-npm run build:app:get-architecture   # Build architecture app only
+npm run build:app:get-resume                   # Build resume app only
+npm run build:app:get-architecture             # Build architecture app only
+npm run build:app:get-archils-work-experience  # Build work experience app only
 npm run typecheck                    # TypeScript type check (no emit)
 npm run dev                          # Watch all apps + start MCP proxy
 npm run deploy                       # Deploy to prod (AWS CDK)
@@ -69,6 +70,8 @@ Tool + resource pairs that render interactive HTML iframes in the host. Follow t
 | Resume app (React UI)        | `src/apps/get-resume/src/get-resume-app.tsx`   |
 | Architecture app (server)    | `src/apps/get-architecture/get-architecture-app.ts` |
 | Architecture app (React UI)  | `src/apps/get-architecture/src/get-architecture-app.tsx` |
+| Work experience app (server) | `src/apps/get-archils-work-experience/get-archils-work-experience-app.ts` |
+| Work experience app (React UI) | `src/apps/get-archils-work-experience/src/get-archils-work-experience-app.tsx` |
 | Shared styles                | `src/styles/globals.css`                       |
 | Local dev proxy              | `scripts/mcp-proxy.ts`                         |
 | Build output (HTML apps)     | `dist/mcp-lambda/`                             |
