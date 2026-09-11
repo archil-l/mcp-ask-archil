@@ -2,18 +2,17 @@ import type {
   McpServer,
   ToolCallback,
   RegisteredTool,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
-import type {
-  ZodRawShapeCompat,
-  AnySchema,
-} from "@modelcontextprotocol/sdk/server/zod-compat.js";
+  StandardSchemaWithJSON,
+} from "@modelcontextprotocol/server";
 
 export interface ToolDefinition {
   name: string;
   register(server: McpServer): RegisteredTool;
 }
 
-export function defineTool<InputArgs extends ZodRawShapeCompat | AnySchema>(
+export function defineTool<
+  InputArgs extends StandardSchemaWithJSON | undefined = undefined,
+>(
   name: string,
   config: {
     title?: string;
