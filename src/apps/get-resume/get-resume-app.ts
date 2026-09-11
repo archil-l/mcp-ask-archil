@@ -3,11 +3,11 @@ import {
   registerAppTool,
   RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import type {
   CallToolResult,
   ReadResourceResult,
-} from "@modelcontextprotocol/sdk/types.js";
+} from "@modelcontextprotocol/server";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { extractText } from "unpdf";
 import fs from "node:fs/promises";

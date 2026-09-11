@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import { Runtime, Architecture, LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
@@ -23,45 +23,31 @@ export class MCPServerStack extends cdk.Stack {
 
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-    // Lambda Web Adapter layer for proper HTTP streaming support
-    // See: https://github.com/awslabs/aws-lambda-web-adapter
-    const webAdapterLayer = LayerVersion.fromLayerVersionArn(
-      this,
-      "lambda-web-adapter",
-      `arn:aws:lambda:${this.region}:753240598075:layer:LambdaAdapterLayerX86:25`,
-    );
-
-    // Lambda function for MCP server
+    // Native Lambda handler (Hono + hono/aws-lambda). No Lambda Web Adapter:
+    // the exported `handler` consumes Function URL events directly.
     const mcpServerFunction = new lambda.Function(this, "mcp-server-function", {
       functionName: `mcp-archil-io-${envConfig.stage}-mcp-server-function`,
       code: lambda.Code.fromAsset(
         path.join(__dirname, "../../../dist/mcp-lambda"),
       ),
-      handler: "run.sh",
+      handler: "index.handler",
       runtime: Runtime.NODEJS_24_X,
       memorySize: 1024,
-      timeout: cdk.Duration.minutes(5), // Longer timeout for streaming responses
+      timeout: cdk.Duration.minutes(5),
       architecture: Architecture.X86_64,
       environment: {
         NODE_ENV: "production",
         RESUME_BUCKET_NAME: resumeBucket.bucketName,
         RESUME_PDF_KEY: envConfig.resumePDFFilename,
-        // Lambda Web Adapter configuration
-        AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
-        PORT: "8080",
-        // Enable async initialization to speed up cold starts
-        AWS_LWA_ASYNC_INIT: "true",
-        // Enable response streaming
-        AWS_LWA_INVOKE_MODE: "response_stream",
       },
-      layers: [webAdapterLayer],
       logRetention: envConfig.logRetentionDays,
     });
 
     // Grant Lambda read access to the resume bucket
     resumeBucket.grantRead(mcpServerFunction);
 
-    // Add Function URL with streaming enabled
+    // RESPONSE_STREAM pairs with hono/aws-lambda `streamHandle`: the response
+    // body streams incrementally (StreamableHTTP SSE) instead of buffering.
     this.functionUrl = mcpServerFunction.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.AWS_IAM,
       invokeMode: lambda.InvokeMode.RESPONSE_STREAM,
